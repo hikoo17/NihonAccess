@@ -57,7 +57,7 @@
 <script setup>
 import { computed } from 'vue'
 import Card from '@/components/ui/Card.vue'
-import ProgressBar from '@/components/ui/ProgressBar.vue'
+import ProgressBar from '@/components/ui/ProgresBar.vue'
 
 const props = defineProps({
   courseTitle: { type: String, default: '' },
