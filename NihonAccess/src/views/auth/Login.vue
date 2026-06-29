@@ -89,7 +89,9 @@ const handleLogin = async () => {
     localStorage.setItem('user_role', payload.user.role)
     localStorage.setItem('user_data', JSON.stringify(payload.user))
 
-    if (payload.user.role === 'teacher' || payload.user.role === 'admin') {
+    if (payload.user.role === 'admin') {
+      router.push({ name: 'AdminDashboard' })
+    } else if (payload.user.role === 'teacher') {
       router.push({ name: 'TeacherDashboard' })
     } else {
       router.push({ name: 'client-dashboard' })

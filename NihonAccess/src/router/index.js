@@ -6,6 +6,8 @@ import CheckEmailVerification from '../views/landing/CheckEmailVerification.vue'
 import Login from '../views/auth/Login.vue'
 import TeacherDashboard from '../views/teacher/TeacherDashboard.vue'
 import TeacherLayout from '../views/teacher/TeacherLayout.vue'
+import AdminLayout from '../views/admin/AdminLayout.vue'
+import AdminDashboard from '../views/admin/AdminDashboard.vue'
 const packageTitles = {
   basic: 'Paket Basic Online',
   premium: 'Paket Premium Online',
@@ -33,6 +35,15 @@ const routes = [
       // { path: 'characters', name: 'TeacherCharacters', component: TeacherCharacters, meta: { title: 'Karakter | Teacher' } },
       // { path: 'listening', name: 'TeacherListening', component: TeacherListening, meta: { title: 'Listening | Teacher' } },
       // { path: 'writing', name: 'TeacherWriting', component: TeacherWriting, meta: { title: 'Writing | Teacher' } },
+    ]
+  },
+  {
+    path: '/admin',
+    component: AdminLayout,
+    meta: { requiresAuth: true, role: 'admin' },
+    children: [
+      { path: '', redirect: { name: 'AdminDashboard' } },
+      { path: 'dashboard', name: 'AdminDashboard', component: AdminDashboard, meta: { title: 'Dashboard | Admin' } },
     ]
   }, 
   {

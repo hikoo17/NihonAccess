@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\MidtransController;
@@ -16,3 +17,8 @@ Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+});
+
