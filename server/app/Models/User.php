@@ -48,4 +48,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Enrollment::class);
     }
+
+    public function activeEnrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class)->where('status', 'active')->where('end_date', '>=', now()->toDateString());
+    }
 }

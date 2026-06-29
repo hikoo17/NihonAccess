@@ -62,7 +62,7 @@ const activeLevel = ref("Semua");
 const packages = [
   {
     slug: "basic-online",
-    name: "Basic Online",
+    name: "Basic",
     tagline: "Untuk pemula yang baru mengenal bahasa Jepang",
     price: "Rp99.000",
     duration: "1 bulan",

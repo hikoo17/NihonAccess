@@ -47,12 +47,12 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import Button from '../../components/ui/Button.vue'
 import Card from '../../components/ui/Card.vue'
 import Input from '../../components/ui/Input.vue'
 import Label from '../../components/ui/Label.vue'
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 const router = useRouter()
 const isLoading = ref(false)
 const errorMessage = ref('')
@@ -67,37 +67,36 @@ const handleLogin = async () => {
   errorMessage.value = ''
   
   try {
-    // Sesuaikan URL endpoint API Laravel Anda
-    const response = await axios.post('/api/login', {
-      username: form.value.username,
-      password: form.value.password
+    const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: form.value.username,
+        password: form.value.password
+      })
     })
-    
-    if (response.data.success) {
-      const data = response.data.data
-      
-      // Simpan token dan data user ke localStorage
-      localStorage.setItem('auth_token', data.token)
-      localStorage.setItem('user_role', data.user.role)
-      localStorage.setItem('user_data', JSON.stringify(data.user))
-      
-      // Setup default header axios untuk request selanjutnya agar ter-autentikasi
-      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
-      
-      // Alihkan halaman berdasarkan role user yang didapat dari DB
-      if (data.user.role === 'teacher' || data.user.role === 'admin') {
-        router.push({ name: 'TeacherDashboard' })
-      } else {
-        router.push({ name: 'StudentDashboard' }) // Panel Belajar Siswa
-      }
+
+    const data = await response.json().catch(() => ({}))
+
+    if (!response.ok || !data.success) {
+      errorMessage.value = data.message || 'Kredensial salah.'
+      return
+    }
+
+    const payload = data.data
+
+    localStorage.setItem('auth_token', payload.token)
+    localStorage.setItem('user_role', payload.user.role)
+    localStorage.setItem('user_data', JSON.stringify(payload.user))
+
+    if (payload.user.role === 'teacher' || payload.user.role === 'admin') {
+      router.push({ name: 'TeacherDashboard' })
+    } else {
+      router.push({ name: 'client-dashboard' })
     }
   } catch (error) {
     console.error('Login Error:', error)
-    if (error.response && error.response.data) {
-      errorMessage.value = error.response.data.message || 'Kredensial salah.'
-    } else {
-      errorMessage.value = 'Tidak dapat terhubung ke server. Periksa koneksi Anda.'
-    }
+    errorMessage.value = 'Tidak dapat terhubung ke server. Periksa koneksi Anda.'
   } finally {
     isLoading.value = false
   }

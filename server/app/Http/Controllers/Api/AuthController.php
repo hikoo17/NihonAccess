@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -12,17 +11,19 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function login(LoginRequest $request): JsonResponse
+    public function login(Request $request): JsonResponse
     {
-        // Ambil data yang dikirim oleh FE (menggunakan key 'username' agar sesuai dengan form Vue)
-        $credentials = $request->validated();
-        $loginInput = $credentials['username'] ?? $credentials['email'] ?? null;
+        // 1. Validasi manual langsung di sini
+        $request->validate([
+            'username' => 'required_without:email|string',
+            'email'    => 'required_without:username|string',
+            'password' => 'required|string',
+        ]);
 
-        if (!$loginInput) {
-            return $this->errorResponse('Input login tidak boleh kosong.', 422);
-        }
+        // 2. Ambil input login (bisa 'username' atau 'email' tergantung apa yang dikirim FE)
+        $loginInput = $request->input('username') ?? $request->input('email');
 
-        // Cari user berdasarkan email ATAU username agar fleksibel sesuai form di Frontend
+        // 3. Cari user berdasarkan email ATAU username
         $user = User::query()
             ->where(function ($query) use ($loginInput) {
                 $query->where('email', $loginInput)
@@ -31,19 +32,22 @@ class AuthController extends Controller
             ->with(['activeEnrollments.package'])
             ->first();
 
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+        // 4. Cek apakah user ada dan password-nya cocok
+        if (! $user || ! Hash::check($request->input('password'), $user->password)) {
             return $this->errorResponse('Kredensial login (Email/Username atau password) tidak valid.', 422);
         }
 
+        // 5. Cek status keaktifan user
         if (! $user->is_active) {
             return $this->errorResponse('Akun tidak aktif.', 403);
         }
 
-        // Jika dia adalah siswa (client), pastikan pendaftaran kelasnya masih aktif
+        // 6. Jika dia adalah siswa (client), pastikan pendaftaran kelasnya masih aktif
         if ($user->role === 'client' && $user->activeEnrollments->isEmpty()) {
             return $this->errorResponse('Enrollment tidak aktif atau sudah expired.', 403);
         }
 
+        // 7. Buat token Sanctum
         $token = $user->createToken('api-token')->plainTextToken;
 
         return $this->successResponse('Login berhasil.', [
