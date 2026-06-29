@@ -28,15 +28,24 @@ class WhatsAppGateway
                     'message' => $this->message($name, $username, $plainPassword),
                 ]);
 
-            if ($response->failed()) {
+            $body = $response->json() ?? [];
+
+            if ($response->failed() || ($body['status'] ?? true) === false) {
                 Log::warning('WhatsApp gateway gagal mengirim pesan.', [
                     'phone' => $phone,
-                    'status' => $response->status(),
-                    'body' => $response->json() ?? $response->body(),
+                    'status_code' => $response->status(),
+                    'fonnte_status' => $body['status'] ?? null,
+                    'fonnte_reason' => $body['reason'] ?? null,
+                    'body' => $body,
                 ]);
 
                 return false;
             }
+
+            Log::info('WhatsApp gateway berhasil mengirim pesan.', [
+                'phone' => $phone,
+                'fonnte_status' => $body['status'] ?? null,
+            ]);
 
             return true;
         } catch (ConnectionException $exception) {
