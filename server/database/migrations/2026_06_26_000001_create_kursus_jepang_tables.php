@@ -18,29 +18,12 @@ return new class extends Migration
             $table->timestamps();
         });
 
-
-// ✅ Tambah: role, is_active, email_verified_at
-// ❌ Hapus: package_type, payment_status, payment_token
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('whatsapp')->nullable();
-            $table->string('username')->nullable()->unique();
-            $table->string('password')->nullable();
-
-            // ✅ Tambah role untuk bedain admin/teacher/client
-            $table->enum('role', ['admin', 'teacher', 'client'])
-                ->default('client');
-
-            // ✅ Tambah is_active untuk suspend user
-            $table->boolean('is_active')->default(true);
-
-            // ✅ Tambah email_verified_at (Laravel standard)
-            $table->timestamp('email_verified_at')->nullable();
-
-            $table->rememberToken();
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreignId('registration_id')
+                ->nullable()
+                ->after('id')
+                ->constrained()
+                ->nullOnDelete();
         });
 
         Schema::create('packages', function (Blueprint $table) {
@@ -72,55 +55,52 @@ return new class extends Migration
             $table->string('order_number')->unique();
             $table->decimal('amount', 12, 2);
             $table->enum('status', [
-                'pending', 'paid', 'failed', 'expired', 'cancelled'
+                'pending',
+                'paid',
+                'failed',
+                'expired',
+                'cancelled'
             ])->default('pending')->index();
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
-        }); 
+        });
 
-  Schema::create('payments', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('order_id')
-           ->constrained()->cascadeOnDelete();
-    $table->string('provider')->default('midtrans');
-    $table->string('snap_token')->nullable();
-    $table->string('transaction_id')->nullable()->index();
-    $table->string('payment_type')->nullable();
-    $table->enum('status', [
-        'pending', 'settlement', 'capture',
-        'deny', 'cancel', 'expire', 'failure'
-    ])->default('pending')->index();
-    $table->json('payload')->nullable();
-    $table->timestamp('paid_at')->nullable();
-    $table->timestamps();
-});
-
-        Schema::create('webhook_logs', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('payment_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('order_id')
+                ->constrained()->cascadeOnDelete();
             $table->string('provider')->default('midtrans');
-            $table->string('event_type')->nullable();
-            $table->string('order_id')->nullable()->index();
-            $table->json('payload');
-            $table->boolean('is_valid')->default(false);
-            $table->timestamp('processed_at')->nullable();
+            $table->string('snap_token')->nullable();
+            $table->string('transaction_id')->nullable()->index();
+            $table->string('payment_type')->nullable();
+            $table->enum('status', [
+                'pending',
+                'settlement',
+                'capture',
+                'deny',
+                'cancel',
+                'expire',
+                'failure'
+            ])->default('pending')->index();
+            $table->json('payload')->nullable();
+            $table->timestamp('paid_at')->nullable();
             $table->timestamps();
         });
 
-Schema::create('enrollments', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('user_id')
-           ->constrained()->cascadeOnDelete();
-    $table->foreignId('order_id')
-           ->constrained()->cascadeOnDelete();
-    $table->foreignId('package_id')
-           ->constrained()->restrictOnDelete();
-    $table->date('start_date');
-    $table->date('end_date')->index();
-    $table->enum('status', ['active', 'expired', 'suspended'])
-           ->default('active')->index();
-    $table->timestamps();
-});
+        Schema::create('enrollments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')
+                ->constrained()->cascadeOnDelete();
+            $table->foreignId('order_id')
+                ->constrained()->cascadeOnDelete();
+            $table->foreignId('package_id')
+                ->constrained()->restrictOnDelete();
+            $table->date('start_date');
+            $table->date('end_date')->index();
+            $table->enum('status', ['active', 'expired', 'suspended'])
+                ->default('active')->index();
+            $table->timestamps();
+        });
 
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
@@ -140,7 +120,7 @@ Schema::create('enrollments', function (Blueprint $table) {
             $table->string('slug');
             $table->longText('content')->nullable();
             $table->string('video_url')->nullable();
-            $table->unsignedInteger('sort_order')->default(0); 
+            $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_active')->default(true)->index();
             $table->timestamps();
             $table->unique(['course_id', 'slug']);
@@ -273,11 +253,11 @@ Schema::create('enrollments', function (Blueprint $table) {
 
             $table->unique(['course_id', 'package_id']);
         });
-    
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('course_package');
         Schema::dropIfExists('writing_attempts');
         Schema::dropIfExists('writing_exercises');
         Schema::dropIfExists('character_attempts');
@@ -292,7 +272,6 @@ Schema::create('enrollments', function (Blueprint $table) {
         Schema::dropIfExists('lessons');
         Schema::dropIfExists('courses');
         Schema::dropIfExists('enrollments');
-        Schema::dropIfExists('webhook_logs');
         Schema::dropIfExists('payments');
         Schema::dropIfExists('orders');
         Schema::dropIfExists('package_features');
@@ -300,7 +279,6 @@ Schema::create('enrollments', function (Blueprint $table) {
 
         Schema::table('users', function (Blueprint $table) {
             $table->dropConstrainedForeignId('registration_id');
-            $table->dropColumn(['role', 'phone', 'is_active']);
         });
 
         Schema::dropIfExists('registrations');

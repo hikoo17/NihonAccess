@@ -4,6 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Mail\CourseAccountCreatedMail;
+use App\Models\Enrollment;
+use App\Models\Order;
+use App\Models\Package;
+use App\Models\Payment;
+use App\Models\Registration;
 use App\Models\User;
 use App\Services\MidtransGateway;
 use App\Services\WhatsAppGateway;
@@ -11,7 +16,6 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -19,15 +23,6 @@ use Illuminate\Support\Str;
 
 class MidtransController extends Controller
 {
-    private array $packageCatalog = [
-        'basic' => ['title' => 'Paket Basic Online', 'price' => 99000, 'duration' => '1 bulan'],
-        'premium' => ['title' => 'Paket Premium Online', 'price' => 199000, 'duration' => '3 bulan'],
-        'private' => ['title' => 'Paket Private Online', 'price' => 499000, 'duration' => '6 bulan'],
-        'reguler' => ['title' => 'Paket Basic On-Site', 'price' => 350000, 'duration' => '1 bulan'],
-        'intensive' => ['title' => 'Paket Premium On-Site', 'price' => 599000, 'duration' => '1 bulan intensif'],
-        'corporate' => ['title' => 'Paket Private Corporate', 'price' => 750000, 'duration' => 'Custom'],
-    ];
-
     public function __construct(
         private MidtransGateway $midtransGateway,
         private WhatsAppGateway $whatsAppGateway,
@@ -59,46 +54,70 @@ class MidtransController extends Controller
 
         $validated = $validator->validated();
         $validated['email'] = Str::lower($validated['email']);
-        $package = $this->packageCatalog[$validated['package_type']];
 
-        $existingRegistration = User::where('email', $validated['email'])->latest('id')->first();
+        $package = Package::active()->where('slug', $validated['package_type'])->first();
 
-        if ($existingRegistration?->payment_status === 'pending' && filled($existingRegistration->payment_token)) {
-            $existingPackage = $this->packageCatalog[$existingRegistration->package_type] ?? $package;
-
+        if (! $package) {
             return response()->json([
-                'message' => 'Masih ada pembayaran pending. Silakan lanjutkan pembayaran sebelumnya.',
-                'registration' => $this->registrationPayload($existingRegistration, $existingPackage),
-                'token' => $existingRegistration->payment_token,
-                'redirect_url' => null,
-            ]);
+                'message' => 'Paket yang dipilih tidak tersedia.',
+            ], 404);
         }
 
-        if ($existingRegistration?->payment_status === 'success') {
+        $existingRegistration = Registration::where('email', $validated['email'])->latest('id')->first();
+
+        if ($existingRegistration?->status === 'active') {
             return response()->json([
                 'message' => 'Email ini sudah memiliki akun aktif. Silakan cek email/WhatsApp atau login.',
             ], 409);
         }
 
-        if ($existingRegistration?->payment_status === 'expired') {
-            $existingRegistration->delete();
+        if ($existingRegistration?->status === 'pending') {
+            $existingOrder = $existingRegistration->user?->orders()->latest('id')->first();
+
+            if ($existingOrder && $existingOrder->status === 'pending' && filled($existingOrder->payment?->snap_token)) {
+                return response()->json([
+                    'message' => 'Masih ada pembayaran pending. Silakan lanjutkan pembayaran sebelumnya.',
+                    'registration' => $this->registrationPayload($existingOrder),
+                    'token' => $existingOrder->payment->snap_token,
+                    'redirect_url' => null,
+                ]);
+            }
+
+            $this->purgeRegistration($existingRegistration);
         }
 
-        if ($existingRegistration?->payment_status === 'pending' && blank($existingRegistration->payment_token)) {
-            $existingRegistration->delete();
+        if ($existingRegistration?->status === 'cancelled') {
+            $this->purgeRegistration($existingRegistration);
         }
 
         try {
-            $registration = DB::transaction(fn() => User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'whatsapp' => $validated['whatsapp'],
-                'package_type' => $validated['package_type'],
-                'payment_status' => 'pending',
-                'payment_token' => null,
-                'username' => null,
-                'password' => null,
-            ]));
+            [$registration, $user, $order] = DB::transaction(function () use ($validated, $package) {
+                $registration = Registration::create([
+                    'full_name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['whatsapp'],
+                    'status' => 'pending',
+                ]);
+
+                $user = User::create([
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'whatsapp' => $validated['whatsapp'],
+                    'role' => 'client',
+                    'is_active' => false,
+                    'registration_id' => $registration->id,
+                ]);
+
+                $order = Order::create([
+                    'user_id' => $user->id,
+                    'package_id' => $package->id,
+                    'order_number' => $this->generateOrderNumber(),
+                    'amount' => $package->price,
+                    'status' => 'pending',
+                ]);
+
+                return [$registration, $user, $order];
+            });
         } catch (\Throwable $exception) {
             Log::error('Gagal membuat pendaftaran kursus.', ['exception' => $exception]);
 
@@ -107,17 +126,20 @@ class MidtransController extends Controller
             ], 500);
         }
 
-        $registration->update([
-            'order_id' => 'NA-' . $registration->id . '-' . Str::lower(Str::random(8)),
-        ]);
-
         try {
-            $transaction = $this->midtransGateway->createSnapToken($registration, $package);
-            $registration->update(['payment_token' => $transaction['token'] ?? null]);
+            $transaction = $this->midtransGateway->createSnapToken($order->refresh()->load('user'), $package);
+
+            Payment::create([
+                'order_id' => $order->id,
+                'provider' => 'midtrans',
+                'snap_token' => $transaction['token'] ?? null,
+                'status' => 'pending',
+                'payload' => $transaction,
+            ]);
 
             return response()->json([
                 'message' => 'Pendaftaran berhasil dibuat. Lanjutkan pembayaran.',
-                'registration' => $this->registrationPayload($registration->refresh(), $package),
+                'registration' => $this->registrationPayload($order->refresh()->load(['user', 'package', 'payment'])),
                 'token' => $transaction['token'] ?? null,
                 'redirect_url' => $transaction['redirect_url'] ?? null,
             ], 201);
@@ -128,68 +150,72 @@ class MidtransController extends Controller
 
             return response()->json([
                 'message' => 'Pendaftaran tersimpan, tetapi Midtrans menolak transaksi: ' . $message,
-                'registration' => $this->registrationPayload($registration, $package),
+                'registration' => $this->registrationPayload($order->load(['user', 'package', 'payment'])),
             ], 502);
         } catch (ConnectionException $exception) {
             return response()->json([
                 'message' => 'Pendaftaran tersimpan, tetapi tidak dapat terhubung ke Midtrans. Silakan coba beberapa saat lagi.',
-                'registration' => $this->registrationPayload($registration, $package),
+                'registration' => $this->registrationPayload($order->load(['user', 'package', 'payment'])),
             ], 502);
         } catch (\Throwable $exception) {
             Log::error('Gagal membuat Snap Token Midtrans.', [
-                'registration_id' => $registration->id,
+                'order_id' => $order->id,
                 'exception' => $exception,
             ]);
 
             return response()->json([
                 'message' => 'Pendaftaran tersimpan, tetapi gagal membuat Snap Token Midtrans.',
-                'registration' => $this->registrationPayload($registration, $package),
+                'registration' => $this->registrationPayload($order->load(['user', 'package', 'payment'])),
             ], 500);
         }
     }
 
-    public function checkStatus(string $orderId)
+    public function checkStatus(string $orderNumber)
     {
-        $registration = User::where('order_id', $orderId)->first();
+        $order = Order::where('order_number', $orderNumber)
+            ->with(['user', 'package', 'payment'])
+            ->first();
 
-        if (! $registration) {
+        if (! $order) {
             return response()->json([
                 'message' => 'Data pendaftaran tidak ditemukan. Hapus data lokal browser.',
                 'should_clear_local_storage' => true,
             ], 404);
         }
 
-        $package = $this->packageCatalog[$registration->package_type] ?? null;
+        $paymentStatus = $this->mapStatus($order);
 
-        if ($registration->payment_status === 'pending') {
+        if ($paymentStatus === 'pending') {
             return response()->json([
                 'message' => 'Transaksi masih menunggu pembayaran.',
                 'status' => 'pending',
                 'should_show_reminder' => true,
                 'should_clear_local_storage' => false,
-                'registration' => $this->registrationPayload($registration, $package),
+                'registration' => $this->registrationPayload($order),
             ]);
         }
 
         return response()->json([
             'message' => 'Transaksi sudah selesai atau kedaluwarsa. Hapus data lokal browser.',
-            'status' => $registration->payment_status,
+            'status' => $paymentStatus,
             'should_show_reminder' => false,
             'should_clear_local_storage' => true,
-            'registration' => $this->registrationPayload($registration, $package),
+            'registration' => $this->registrationPayload($order),
         ]);
     }
 
-    public function syncPaymentStatus(string $orderId)
+    public function syncPaymentStatus(string $orderNumber)
     {
-        $registration = User::where('order_id', $orderId)->first();
+        $order = Order::where('order_number', $orderNumber)
+            ->with(['user', 'package', 'payment'])
+            ->first();
 
-        if (! $registration) {
+        if (! $order) {
             return response()->json(['message' => 'Order tidak ditemukan.'], 404);
         }
 
         try {
-            $status = $this->midtransGateway->getTransactionStatus($orderId);
+            $status = $this->midtransGateway->getTransactionStatus($orderNumber);
 
             Log::info('Midtrans Sync Status Payload:', (array) $status);
         } catch (RequestException $exception) {
@@ -200,26 +226,7 @@ class MidtransController extends Controller
             return response()->json(['message' => 'Tidak dapat terhubung ke Midtrans.'], 502);
         }
 
-        $transactionStatus = $status['transaction_status'] ?? null;
-        $fraudStatus = $status['fraud_status'] ?? null;
-
-        if (in_array($transactionStatus, ['settlement', 'capture'], true) && $fraudStatus !== 'deny') {
-            return $this->markPaymentSuccess($registration);
-        }
-
-        if (in_array($transactionStatus, ['expire', 'cancel', 'deny'], true)) {
-            $registration->update(['payment_status' => 'expired']);
-            return response()->json([
-                'message' => 'Transaksi sudah kedaluwarsa atau dibatalkan.',
-                'payment_status' => 'expired',
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Transaksi belum sukses atau masih pending.',
-            'payment_status' => $registration->payment_status,
-            'midtrans_status' => $transactionStatus,
-        ]);
+        return $this->applyMidtransStatus($order, $status);
     }
 
     public function confirmSnapPayment(Request $request)
@@ -237,24 +244,22 @@ class MidtransController extends Controller
             return response()->json(['message' => 'Signature hasil Snap tidak valid.'], 403);
         }
 
-        $registration = User::where('order_id', $payload['order_id'])->first();
+        $order = Order::where('order_number', $payload['order_id'])
+            ->with(['user', 'package', 'payment'])
+            ->first();
 
-        if (! $registration) {
+        if (! $order) {
             return response()->json(['message' => 'Order tidak ditemukan.'], 404);
         }
 
-        $transactionStatus = $payload['transaction_status'];
-        $fraudStatus = $payload['fraud_status'] ?? null;
-
-        if (in_array($transactionStatus, ['settlement', 'capture'], true) && $fraudStatus !== 'deny') {
-            return $this->markPaymentSuccess($registration);
-        }
-
-        return response()->json([
-            'message' => 'Hasil Snap belum menunjukkan pembayaran sukses.',
-            'payment_status' => $registration->payment_status,
-            'midtrans_status' => $transactionStatus,
-        ]);
+        return $this->applyMidtransStatus(
+            $order,
+            [
+                'transaction_status' => $payload['transaction_status'],
+                'fraud_status' => $payload['fraud_status'] ?? null,
+            ],
+            isSignatureVerified: true
+        );
     }
 
     public function callback(Request $request)
@@ -266,53 +271,109 @@ class MidtransController extends Controller
             'signature_key' => ['required', 'string'],
             'transaction_status' => ['required', 'string'],
             'fraud_status' => ['nullable', 'string'],
+            'transaction_id' => ['nullable', 'string'],
+            'payment_type' => ['nullable', 'string'],
         ]);
 
         if (! $this->midtransGateway->isValidSignature($payload)) {
             return response()->json(['message' => 'Signature Midtrans tidak valid.'], 403);
         }
 
-        $registration = User::where('order_id', $payload['order_id'])->first();
+        $order = Order::where('order_number', $payload['order_id'])
+            ->with(['user', 'package', 'payment'])
+            ->first();
 
-        if (! $registration) {
+        if (! $order) {
             return response()->json(['message' => 'Order tidak ditemukan.'], 404);
         }
 
-        $transactionStatus = $payload['transaction_status'];
-        $fraudStatus = $payload['fraud_status'] ?? null;
-
-        if (in_array($transactionStatus, ['settlement', 'capture'], true) && $fraudStatus !== 'deny') {
-            return $this->markPaymentSuccess($registration);
-        }
-
-        if (in_array($transactionStatus, ['expire', 'cancel', 'deny'], true)) {
-            $registration->update(['payment_status' => 'expired']);
-
-            return response()->json(['message' => 'Status pembayaran diubah menjadi expired.']);
-        }
-
-        return response()->json(['message' => 'Callback diterima tanpa perubahan status.']);
+        return $this->applyMidtransStatus(
+            $order,
+            [
+                'transaction_status' => $payload['transaction_status'],
+                'fraud_status' => $payload['fraud_status'] ?? null,
+                'transaction_id' => $payload['transaction_id'] ?? null,
+                'payment_type' => $payload['payment_type'] ?? null,
+            ],
+            isSignatureVerified: true
+        );
     }
 
-    private function markPaymentSuccess(User $registration)
+    private function applyMidtransStatus(Order $order, array $status, bool $isSignatureVerified = false)
     {
-        if ($registration->payment_status === 'success') {
+        $transactionStatus = $status['transaction_status'] ?? null;
+        $fraudStatus = $status['fraud_status'] ?? null;
+
+        if (in_array($transactionStatus, ['settlement', 'capture'], true) && $fraudStatus !== 'deny') {
+            return $this->markPaymentSuccess($order, $status);
+        }
+
+        if (in_array($transactionStatus, ['expire', 'cancel', 'deny', 'failure'], true)) {
+            return $this->markPaymentExpired($order, $status);
+        }
+
+        return response()->json([
+            'message' => 'Transaksi belum sukses atau masih pending.',
+            'payment_status' => $this->mapStatus($order),
+            'midtrans_status' => $transactionStatus,
+        ]);
+    }
+
+    private function markPaymentSuccess(Order $order, array $status = [])
+    {
+        if ($order->status === 'paid') {
             return response()->json(['message' => 'Pembayaran sudah pernah diproses.']);
         }
 
         $plainPassword = Str::upper(Str::random(8));
         $username = $this->generateUniqueUsername();
 
-        $registration->update([
-            'payment_status' => 'success',
-            'username' => $username,
-            'password' => Hash::make($plainPassword),
-        ]);
+        DB::transaction(function () use ($order, $status, $plainPassword, $username) {
+            $order->user->update([
+                'username' => $username,
+                'password' => $plainPassword,
+                'is_active' => true,
+                'email_verified_at' => now(),
+            ]);
 
-        $mailSent = $this->sendAccountEmail($registration->refresh(), $plainPassword);
+            $order->update([
+                'status' => 'paid',
+                'paid_at' => now(),
+            ]);
+
+            $order->payment?->update([
+                'status' => 'settlement',
+                'paid_at' => now(),
+                'transaction_id' => $status['transaction_id'] ?? $order->payment?->transaction_id,
+                'payment_type' => $status['payment_type'] ?? $order->payment?->payment_type,
+                'payload' => array_merge((array) $order->payment?->payload, $status),
+            ]);
+
+            $order->user->registration?->update([
+                'status' => 'active',
+                'account_created_at' => now(),
+            ]);
+
+            Enrollment::firstOrCreate(
+                [
+                    'user_id' => $order->user_id,
+                    'order_id' => $order->id,
+                ],
+                [
+                    'package_id' => $order->package_id,
+                    'start_date' => now()->toDateString(),
+                    'end_date' => now()->addDays($order->package->duration_days)->toDateString(),
+                    'status' => 'active',
+                ]
+            );
+        });
+
+        $user = $order->user->refresh();
+
+        $mailSent = $this->sendAccountEmail($order->refresh(), $plainPassword);
         $waSent = $this->whatsAppGateway->sendAccountReceipt(
-            $registration->whatsapp,
-            $registration->name,
+            $user->whatsapp,
+            $user->name,
             $username,
             $plainPassword
         );
@@ -328,21 +389,62 @@ class MidtransController extends Controller
         ]);
     }
 
-    private function sendAccountEmail(User $registration, string $plainPassword): bool
+    private function markPaymentExpired(Order $order, array $status = [])
+    {
+        DB::transaction(function () use ($order, $status) {
+            $order->update(['status' => 'expired']);
+
+            $order->payment?->update([
+                'status' => $status['transaction_status'] ?? 'expire',
+                'payload' => array_merge((array) $order->payment?->payload, $status),
+            ]);
+
+            $order->user->registration?->update(['status' => 'cancelled']);
+        });
+
+        return response()->json([
+            'message' => 'Transaksi sudah kedaluwarsa atau dibatalkan.',
+            'payment_status' => 'expired',
+        ]);
+    }
+
+    private function sendAccountEmail(Order $order, string $plainPassword): bool
     {
         try {
-            Mail::to($registration->email)->send(new CourseAccountCreatedMail($registration, $plainPassword));
+            Mail::to($order->user->email)->send(new CourseAccountCreatedMail($order, $plainPassword));
 
             return true;
         } catch (\Throwable $exception) {
             Log::warning('Gagal mengirim email akun kursus.', [
-                'registration_id' => $registration->id,
-                'email' => $registration->email,
+                'order_id' => $order->id,
+                'email' => $order->user->email,
                 'exception' => $exception,
             ]);
 
             return false;
         }
+    }
+
+    private function purgeRegistration(Registration $registration): void
+    {
+        DB::transaction(function () use ($registration) {
+            $user = $registration->user;
+
+            if ($user) {
+                $user->delete();
+            }
+
+            $registration->delete();
+        });
+    }
+
+    private function generateOrderNumber(): string
+    {
+        do {
+            $orderNumber = 'NA-' . now()->format('Ymd') . '-' . Str::upper(Str::random(6));
+        } while (Order::where('order_number', $orderNumber)->exists());
+
+        return $orderNumber;
     }
 
     private function generateUniqueUsername(): string
@@ -354,17 +456,26 @@ class MidtransController extends Controller
         return $username;
     }
 
-    private function registrationPayload(User $registration, ?array $package): array
+    private function mapStatus(Order $order): string
+    {
+        return match ($order->status) {
+            'paid' => 'success',
+            'expired', 'failed', 'cancelled' => 'expired',
+            default => 'pending',
+        };
+    }
+
+    private function registrationPayload(Order $order): array
     {
         return [
-            'order_id' => $registration->order_id,
-            'name' => $registration->name,
-            'email' => $registration->email,
-            'whatsapp' => $registration->whatsapp,
-            'package_type' => $registration->package_type,
-            'package_name' => $package['title'] ?? $registration->package_type,
-            'payment_status' => $registration->payment_status,
-            'payment_token' => $registration->payment_token,
+            'order_id' => $order->order_number,
+            'name' => $order->user?->name,
+            'email' => $order->user?->email,
+            'whatsapp' => $order->user?->whatsapp,
+            'package_type' => $order->package?->slug,
+            'package_name' => $order->package?->name,
+            'payment_status' => $this->mapStatus($order),
+            'payment_token' => $order->payment?->snap_token,
         ];
     }
 }
