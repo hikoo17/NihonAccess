@@ -13,10 +13,10 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-import TeacherSidebar from '@/components/Teacher/TeacherSidebar.vue'
-import TeacherTopbar from '@/components/Teacher/TeacherTopbar.vue'
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import TeacherSidebar from '@/components/teacher/TeacherSidebar.vue';
+import TeacherTopbar from '@/components/teacher/TeacherTopbar.vue';
 
 const route = useRoute()
 

@@ -96,7 +96,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import TeacherStatCard from '@/components/Teacher/TeacherStatCard.vue'
+import TeacherStatCard from '@/components/teacher/TeacherStatCard.vue'
 
 const summaryStats = ref([])
 const myCourses = ref([])
