@@ -33,7 +33,24 @@ const routes = [
       { path: 'listening', name: 'TeacherListening', component: TeacherListening, meta: { title: 'Listening | Teacher' } },
       { path: 'writing', name: 'TeacherWriting', component: TeacherWriting, meta: { title: 'Writing | Teacher' } },
     ]
-  },
+  }, 
+  {
+    path: '/client',
+    component: () => import('@/components/Client/ClientShell.vue'),
+    meta: { requiresAuth: true },
+    children: [
+      { path: '', redirect: '/client/dashboard' },
+      { path: 'dashboard', name: 'client-dashboard', component: () => import('@/views/client/Dashboard.vue'), meta: { title: 'Dashboard | Client' } },
+      { path: 'my-courses', name: 'client-my-courses', component: () => import('@/views/client/MyCourses.vue'), meta: { title: 'Kursus Saya | Client' } },
+      { path: 'my-courses/:id/learn', name: 'client-learn', component: () => import('@/views/client/LearnView.vue'), props: true, meta: { title: 'Belajar | Client' } },
+      { path: 'packages', name: 'client-packages', component: () => import('@/views/client/PackageList.vue'), meta: { title: 'Beli Paket | Client' } },
+      { path: 'packages/:slug', name: 'client-package-detail', component: () => import('@/views/client/PackageDetail.vue'), props: true, meta: { title: 'Detail Paket | Client' } },
+      { path: 'checkout/:packageId', name: 'client-checkout', component: () => import('@/views/client/Checkout.vue'), props: true, meta: { title: 'Checkout | Client' } },
+      { path: 'payment-status/:orderId', name: 'client-payment-status', component: () => import('@/views/client/PaymentStatus.vue'), props: true, meta: { title: 'Status Pembayaran | Client' } },
+      { path: 'orders', name: 'client-orders', component: () => import('@/views/client/OrderHistory.vue'), meta: { title: 'Riwayat Pesanan | Client' } },
+      { path: 'profile', name: 'client-profile', component: () => import('@/views/client/Profile.vue'), meta: { title: 'Profil Saya | Client' } },
+    ],
+  }
 
 ]
 
