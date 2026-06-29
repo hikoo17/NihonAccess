@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.section-flow-white {
+  position: relative;
+  background: #ffffff;
+}
+
+.red-depth {
+  background: #cf3d3d;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fdf6f3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #f35252;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #cf3d3d;
+}
