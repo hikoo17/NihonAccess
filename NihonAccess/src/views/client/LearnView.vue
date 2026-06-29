@@ -110,7 +110,7 @@ import Breadcrumb from "@/components/ui/Breadcrumb.vue";
 import Card from "@/components/ui/Card.vue";
 import Button from "@/components/ui/Button.vue";
 import Badge from "@/components/ui/Badge.vue";
-import LessonSidebar from "@/components/client/LessonSidebar.vue";
+import LessonSidebar from "@/components/Client/LessonSidebar.vue";
 
 const props = defineProps({
   id: { type: [String, Number], default: "" },

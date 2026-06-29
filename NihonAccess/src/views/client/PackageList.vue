@@ -53,7 +53,7 @@
 import { ref } from "vue";
 import Breadcrumb from "@/components/ui/Breadcrumb.vue";
 import Input from "@/components/ui/Input.vue";
-import PackageCard from "@/components/client/PackageCard.vue";
+import PackageCard from "@/components/Client/PackageCard.vue";
 
 const search = ref("");
 const levels = ["Semua", "Online", "On-Site"];

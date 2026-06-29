@@ -111,7 +111,7 @@ import Card from "@/components/ui/Card.vue";
 import Button from "@/components/ui/Button.vue";
 import Input from "@/components/ui/Input.vue";
 import Label from "@/components/ui/Label.vue";
-import CheckoutSummary from "@/components/client/CheckoutSummary.vue";
+import CheckoutSummary from "@/components/Client/CheckoutSummary.vue";
 
 const props = defineProps({
   packageId: { type: [String, Number], default: "" },

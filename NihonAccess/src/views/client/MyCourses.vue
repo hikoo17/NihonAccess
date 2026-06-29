@@ -84,7 +84,7 @@ import { ref, computed } from "vue";
 import Breadcrumb from "@/components/ui/Breadcrumb.vue";
 import Card from "@/components/ui/Card.vue";
 import Button from "@/components/ui/Button.vue";
-import CourseCard from "@/components/client/CourseCard.vue";
+import CourseCard from "@/components/Client/CourseCard.vue";
 
 const tabs = ["Semua", "Aktif", "Selesai", "Kedaluwarsa"];
 const activeTab = ref("Semua");
