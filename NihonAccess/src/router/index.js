@@ -4,6 +4,7 @@ import PackageDetail from '../views/landing/PackageDetail.vue'
 import Register from '../views/landing/Register.vue'
 import CheckEmailVerification from '../views/landing/CheckEmailVerification.vue'
 import Login from '../views/auth/Login.vue'
+import TeacherDashboard from '../views/teacher/TeacherDashboard.vue'
 import TeacherLayout from '../views/teacher/TeacherLayout.vue'
 const packageTitles = {
   basic: 'Paket Basic Online',
