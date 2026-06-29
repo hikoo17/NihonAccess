@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
-import PackageDetail from '../views/PackageDetail.vue'
-import Register from '../views/Register.vue'
-import CheckEmailVerification from '../views/CheckEmailVerification.vue'
-import Login from '../views/Login.vue'
+import Home from '../views/landing/Home.vue'
+import PackageDetail from '../views/landing/PackageDetail.vue'
+import Register from '../views/landing/Register.vue'
+import CheckEmailVerification from '../views/landing/CheckEmailVerification.vue'
+import Login from '../views/auth/Login.vue'
 
 const packageTitles = {
   basic: 'Paket Basic Online',
