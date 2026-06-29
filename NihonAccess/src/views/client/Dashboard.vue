@@ -1,6 +1,5 @@
 <template>
   <div class="mx-auto max-w-6xl space-y-8">
-    <!-- Header -->
     <div>
       <Breadcrumb
         :items="[{ label: 'Beranda', to: '/' }, { label: 'Dashboard' }]"
@@ -8,14 +7,14 @@
       <h1
         class="mt-3 text-2xl font-extrabold tracking-tight text-slate-800 sm:text-3xl"
       >
-        Selamat datang kembali, <span class="text-[#cf3d3d]">Nama!</span> 👋
+        Selamat datang kembali, <span class="text-[#cf3d3d]">Nama!</span> 
+        <span class="wave-emoji">👋</span>
       </h1>
       <p class="mt-1 text-sm text-slate-500">
         Lanjutkan belajar dan capai targetmu hari ini.
       </p>
     </div>
 
-    <!-- Stats -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
         label="Kursus Aktif"
@@ -49,7 +48,6 @@
       />
     </div>
 
-    <!-- Continue learning -->
     <div>
       <div class="mb-4 flex items-center justify-between">
         <h2 class="text-lg font-extrabold text-slate-800">Lanjutkan Belajar</h2>
@@ -100,7 +98,6 @@
       </div>
     </div>
 
-    <!-- Recent orders -->
     <div>
       <div class="mb-4 flex items-center justify-between">
         <h2 class="text-lg font-extrabold text-slate-800">Pesanan Terbaru</h2>
@@ -181,3 +178,22 @@ const orders = [
   },
 ];
 </script>
+
+<style scoped>
+.wave-emoji {
+  display: inline-block;
+  animation: wave-animation 2.5s infinite;
+  transform-origin: 70% 70%;
+}
+
+@keyframes wave-animation {
+    0% { transform: rotate( 0.0deg) }
+   10% { transform: rotate(14.0deg) }
+   20% { transform: rotate(-8.0deg) }
+   30% { transform: rotate(14.0deg) }
+   40% { transform: rotate(-4.0deg) }
+   50% { transform: rotate(10.0deg) }
+   60% { transform: rotate( 0.0deg) }
+  100% { transform: rotate( 0.0deg) }
+}
+</style>

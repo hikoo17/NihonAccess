@@ -1,18 +1,21 @@
 <template>
   <div class="min-h-screen bg-slate-50/50 font-sans text-slate-900 antialiased">
     <!-- Sidebar -->
-    <ClientSidebar :is-open="isSidebarOpen" @close="isSidebarOpen = false" />
+    <ClientSidebar :is-collapsed="isCollapsed" @toggle="toggleSidebar" @navigate="onNavigate" />
 
-    <!-- Overlay mobile -->
+    <!-- Backdrop (mobile only, saat melebar) -->
     <div
-      v-if="isSidebarOpen"
+      v-if="!isCollapsed"
       class="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-sm lg:hidden"
-      @click="isSidebarOpen = false"
+      @click="isCollapsed = true"
     />
 
-    <!-- Konten utama -->
-    <div class="lg:pl-64">
-      <ClientTopbar @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+    <!-- Konten utama: padding kiri dinamis -->
+    <div
+      class="transition-all duration-300 ease-in-out pl-20"
+      :class="isCollapsed ? 'lg:pl-20' : 'lg:pl-64'"
+    >
+      <ClientTopbar />
 
       <main class="px-6 py-8 sm:px-8 lg:px-10">
         <router-view v-slot="{ Component }">
@@ -26,11 +29,41 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import ClientSidebar from '@/components/Client/ClientSidebar.vue'
 import ClientTopbar from '@/components/Client/ClientTopbar.vue'
 
-const isSidebarOpen = ref(false)
+const DESKTOP_BREAKPOINT = 1024
+
+// isCollapsed: true = menyempit (logo+ikon), false = melebar (full)
+const isCollapsed = ref(false)
+
+const toggleSidebar = () => {
+  isCollapsed.value = !isCollapsed.value
+}
+
+// Klik menu di mobile → otomatis menyempit balik
+const onNavigate = () => {
+  if (typeof window !== 'undefined' && window.innerWidth < DESKTOP_BREAKPOINT) {
+    isCollapsed.value = true
+  }
+}
+
+const handleResize = () => {
+  if (window.innerWidth < DESKTOP_BREAKPOINT) {
+    isCollapsed.value = true
+  }
+}
+
+onMounted(() => {
+  // Default: melebar di desktop, menyempit di mobile
+  isCollapsed.value = window.innerWidth < DESKTOP_BREAKPOINT
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>

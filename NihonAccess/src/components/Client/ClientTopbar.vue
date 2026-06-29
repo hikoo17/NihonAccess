@@ -1,15 +1,7 @@
 <template>
   <header class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-100 bg-white/80 px-6 backdrop-blur-md sm:px-8">
-    <!-- Left: hamburger + breadcrumb -->
+    <!-- Left: title saja (toggle sudah pindah ke sidebar) -->
     <div class="flex items-center gap-3">
-      <button
-        @click="$emit('toggle-sidebar')"
-        class="inline-flex items-center justify-center rounded-xl p-2 text-slate-600 transition hover:bg-slate-100 lg:hidden"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-        </svg>
-      </button>
       <h2 class="text-base font-extrabold text-slate-800">{{ pageTitle }}</h2>
     </div>
 
@@ -38,8 +30,6 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-
-defineEmits(['toggle-sidebar'])
 
 const route = useRoute()
 const pageTitle = computed(() => route.meta.title || 'Dashboard')

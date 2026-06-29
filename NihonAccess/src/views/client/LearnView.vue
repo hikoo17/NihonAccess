@@ -65,7 +65,7 @@
             </h3>
             <ul class="space-y-2 text-xs text-slate-600">
               <li class="flex items-start gap-2">
-                <span class="mt-1 h-1.5 w-1.5 rounded-full bg-[#cf3d3d]"></span>
+                <span class="font-jp mt-1 h-1.5 w-1.5 rounded-full bg-[#cf3d3d]"></span>
                 Pengenalan 46 huruf hiragana dasar (あ 〜 ん)
               </li>
               <li class="flex items-start gap-2">
