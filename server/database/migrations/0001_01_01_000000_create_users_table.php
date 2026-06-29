@@ -15,8 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('whatsapp')->nullable();
+            $table->string('package_type')->nullable();
+            $table->enum('payment_status', ['pending', 'success', 'expired'])->default('pending');
+            $table->string('payment_token')->nullable();
+            $table->string('username')->nullable()->unique();
+            $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
