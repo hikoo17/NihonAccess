@@ -38,17 +38,17 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import Navbar from '../components/Navbar.vue'
-import Hero from '../components/Hero.vue'
-import SocialProof from '../components/SocialProof.vue'
-import Features from '../components/Features.vue'
-import Syllabus from '../components/Syllabus.vue'
-import Pricing from '../components/Pricing.vue'
-import Testimonials from '../components/Testimonials.vue'
-import FAQ from '../components/FAQ.vue'
-import FinalCTA from '../components/FinalCTA.vue'
-import Footer from '../components/Footer.vue'
-import { checkRegistrationStatus, confirmSnapPayment, loadMidtransSnap, syncRegistrationPayment } from '../lib/midtrans.js'
+import Navbar from '../../components/Navbar.vue'
+import Hero from '../../components/Hero.vue'
+import SocialProof from '../../components/SocialProof.vue'
+import Features from '../../components/Features.vue'
+import Syllabus from '../../components/Syllabus.vue'
+import Pricing from '../../components/Pricing.vue'
+import Testimonials from '../../components/Testimonials.vue'
+import FAQ from '../../components/FAQ.vue'
+import FinalCTA from '../../components/FinalCTA.vue'
+import Footer from '../../components/Footer.vue'
+import { checkRegistrationStatus, confirmSnapPayment, loadMidtransSnap, syncRegistrationPayment } from '../../lib/midtrans.js'
 
 const storageKey = 'nihonaccess-registration-form'
 const pendingRegistration = ref(null)

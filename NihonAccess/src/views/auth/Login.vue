@@ -39,11 +39,11 @@
 
 <script setup>
 import { ref } from 'vue'
-import Navbar from '../components/Navbar.vue'
-import Button from '../components/ui/Button.vue'
-import Card from '../components/ui/Card.vue'
-import Input from '../components/ui/Input.vue'
-import Label from '../components/ui/Label.vue'
+import Navbar from '../../components/Navbar.vue'
+import Button from '../../components/ui/Button.vue'
+import Card from '../../components/ui/Card.vue'
+import Input from '../../components/ui/Input.vue'
+import Label from '../../components/ui/Label.vue'
 
 const form = ref({
   username: '',
