@@ -12,3 +12,6 @@ Route::get('/registration/check-status/{order_id}', [MidtransController::class, 
 Route::post('/registration/sync-payment/{order_id}', [MidtransController::class, 'syncPaymentStatus']);
 Route::post('/registration/confirm-snap', [MidtransController::class, 'confirmSnapPayment']);
 Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
+
+Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
