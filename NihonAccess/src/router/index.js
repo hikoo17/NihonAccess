@@ -19,8 +19,25 @@ const routes = [
   { path: '/paket/:type', name: 'PackageDetail', component: PackageDetail, props: true, meta: { titlePrefix: 'Detail' } },
   { path: '/daftar/:type', name: 'Register', component: Register, props: true, meta: { titlePrefix: 'Pendaftaran' } },
   { path: '/cek-email-verifikasi', name: 'CheckEmailVerification', component: CheckEmailVerification, meta: { title: 'Cek Email Verifikasi | NihonAccess' } },
-  { path: '/login', name: 'Login', component: Login, meta: { title: 'Login | NihonAccess' } }
+  { path: '/login', name: 'Login', component: Login, meta: { title: 'Login | NihonAccess' } },
+  {    path: '/teacher',
+    component: TeacherLayout,
+    meta: { requiresAuth: true, role: 'teacher' },
+    children: [
+      { path: '', redirect: { name: 'TeacherDashboard' } },
+      { path: 'dashboard', name: 'TeacherDashboard', component: TeacherDashboard, meta: { title: 'Dashboard | Teacher' } },
+      { path: 'courses', name: 'TeacherCourses', component: TeacherCourses, meta: { title: 'Kursus | Teacher' } },
+      { path: 'lessons', name: 'TeacherLessons', component: TeacherLessons, meta: { title: 'Pelajaran | Teacher' } },
+      { path: 'quiz', name: 'TeacherQuiz', component: TeacherQuiz, meta: { title: 'Quiz | Teacher' } },
+      { path: 'characters', name: 'TeacherCharacters', component: TeacherCharacters, meta: { title: 'Karakter | Teacher' } },
+      { path: 'listening', name: 'TeacherListening', component: TeacherListening, meta: { title: 'Listening | Teacher' } },
+      { path: 'writing', name: 'TeacherWriting', component: TeacherWriting, meta: { title: 'Writing | Teacher' } },
+    ]
+  },
+
 ]
+
+
 
 const router = createRouter({
   history: createWebHistory(),
