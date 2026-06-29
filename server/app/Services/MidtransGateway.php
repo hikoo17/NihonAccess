@@ -14,7 +14,7 @@ class MidtransGateway
             ->asJson()
             ->post($this->snapUrl(), [
                 'transaction_details' => [
-                    'order_id' => (string) $registration->id,
+                    'order_id' => (string) $registration->order_id,
                     'gross_amount' => $package['price'],
                 ],
                 'item_details' => [[

@@ -1,8 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\MidtransController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::post('/register-course', [MidtransController::class, 'registerCourse']);
+Route::get('/registration/check-status/{order_id}', [MidtransController::class, 'checkStatus']);
+Route::post('/registration/sync-payment/{order_id}', [MidtransController::class, 'syncPaymentStatus']);
+Route::post('/registration/confirm-snap', [MidtransController::class, 'confirmSnapPayment']);
+Route::post('/midtrans/callback', [MidtransController::class, 'callback']);

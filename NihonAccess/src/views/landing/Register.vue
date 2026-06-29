@@ -114,14 +114,14 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import Navbar from "../components/Navbar.vue";
-import Breadcrumb from "../components/ui/Breadcrumb.vue";
-import Button from "../components/ui/Button.vue";
-import Card from "../components/ui/Card.vue";
-import Input from "../components/ui/Input.vue";
-import Label from "../components/ui/Label.vue";
-import Select from "../components/ui/Select.vue"; // Di-import kembali
-import { confirmSnapPayment, createMidtransTransaction, loadMidtransSnap, syncRegistrationPayment } from "../lib/midtrans.js";
+import Navbar from "../../components/Navbar.vue";
+import Breadcrumb from "../../components/ui/Breadcrumb.vue";
+import Button from "../../components/ui/Button.vue";
+import Card from "../../components/ui/Card.vue";
+import Input from "../../components/ui/Input.vue";
+import Label from "../../components/ui/Label.vue";
+import Select from "../../components/ui/Select.vue"; // Di-import kembali
+import { confirmSnapPayment, createMidtransTransaction, loadMidtransSnap, syncRegistrationPayment } from "../../lib/midtrans.js";
 
 const props = defineProps({
   type: { type: String, required: false, default: "" }, // Ubah ke optional untuk rute Navbar umum

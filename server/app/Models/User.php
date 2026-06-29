@@ -21,6 +21,7 @@ class User extends Authenticatable
         'package_type',
         'payment_status',
         'payment_token',
+        'order_id',
         'username',
         'password',
     ];

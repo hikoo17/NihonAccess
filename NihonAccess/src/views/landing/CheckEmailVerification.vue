@@ -104,10 +104,10 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import Navbar from '../components/Navbar.vue'
-import Button from '../components/ui/Button.vue'
-import Card from '../components/ui/Card.vue'
-import { syncRegistrationPayment } from '../lib/midtrans.js'
+import Navbar from '../../components/Navbar.vue'
+import Button from '../../components/ui/Button.vue'
+import Card from '../../components/ui/Card.vue'
+import { syncRegistrationPayment } from '../../lib/midtrans.js'
 
 const route = useRoute()
 const router = useRouter()

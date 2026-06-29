@@ -91,10 +91,10 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import Navbar from '../components/Navbar.vue'
-import Breadcrumb from '../components/ui/Breadcrumb.vue'
-import Button from '../components/ui/Button.vue'
-import Card from '../components/ui/Card.vue'
+import Navbar from '../../components/Navbar.vue'
+import Breadcrumb from '../../components/ui/Breadcrumb.vue'
+import Button from '../../components/ui/Button.vue'
+import Card from '../../components/ui/Card.vue'
 
 const props = defineProps({
   type: { type: String, required: true }
