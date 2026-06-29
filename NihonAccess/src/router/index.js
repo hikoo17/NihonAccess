@@ -4,7 +4,7 @@ import PackageDetail from '../views/landing/PackageDetail.vue'
 import Register from '../views/landing/Register.vue'
 import CheckEmailVerification from '../views/landing/CheckEmailVerification.vue'
 import Login from '../views/auth/Login.vue'
-
+import TeacherLayout from '../views/teacher/TeacherLayout.vue'
 const packageTitles = {
   basic: 'Paket Basic Online',
   premium: 'Paket Premium Online',
@@ -26,11 +26,11 @@ const routes = [
     children: [
       { path: '', redirect: { name: 'TeacherDashboard' } },
       { path: 'dashboard', name: 'TeacherDashboard', component: TeacherDashboard, meta: { title: 'Dashboard | Teacher' } },
-      { path: 'courses', name: 'TeacherCourses', component: TeacherCourses, meta: { title: 'Kursus | Teacher' } },
-      { path: 'lessons', name: 'TeacherLessons', component: TeacherLessons, meta: { title: 'Pelajaran | Teacher' } },
-      { path: 'quiz', name: 'TeacherQuiz', component: TeacherQuiz, meta: { title: 'Quiz | Teacher' } },
-      { path: 'characters', name: 'TeacherCharacters', component: TeacherCharacters, meta: { title: 'Karakter | Teacher' } },
-      { path: 'listening', name: 'TeacherListening', component: TeacherListening, meta: { title: 'Listening | Teacher' } },
+      // { path: 'courses', name: 'TeacherCourses', component: TeacherCourses, meta: { title: 'Kursus | Teacher' } },
+      // { path: 'lessons', name: 'TeacherLessons', component: TeacherLessons, meta: { title: 'Pelajaran | Teacher' } },
+      // { path: 'quiz', name: 'TeacherQuiz', component: TeacherQuiz, meta: { title: 'Quiz | Teacher' } },
+      // { path: 'characters', name: 'TeacherCharacters', component: TeacherCharacters, meta: { title: 'Karakter | Teacher' } },
+      // { path: 'listening', name: 'TeacherListening', component: TeacherListening, meta: { title: 'Listening | Teacher' } },
       // { path: 'writing', name: 'TeacherWriting', component: TeacherWriting, meta: { title: 'Writing | Teacher' } },
     ]
   }, 
