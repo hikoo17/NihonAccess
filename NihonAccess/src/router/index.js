@@ -31,7 +31,7 @@ const routes = [
       { path: 'quiz', name: 'TeacherQuiz', component: TeacherQuiz, meta: { title: 'Quiz | Teacher' } },
       { path: 'characters', name: 'TeacherCharacters', component: TeacherCharacters, meta: { title: 'Karakter | Teacher' } },
       { path: 'listening', name: 'TeacherListening', component: TeacherListening, meta: { title: 'Listening | Teacher' } },
-      { path: 'writing', name: 'TeacherWriting', component: TeacherWriting, meta: { title: 'Writing | Teacher' } },
+      // { path: 'writing', name: 'TeacherWriting', component: TeacherWriting, meta: { title: 'Writing | Teacher' } },
     ]
   }, 
   {
