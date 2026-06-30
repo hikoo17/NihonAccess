@@ -12,9 +12,10 @@
         :key="index"
         :label="stat.label"
         :value="stat.value"
-      >
-        <template #icon><component :is="stat.icon" /></template>
-      </TeacherStatCard>
+        :icon="stat.icon"
+        :icon-bg="stat.iconBg"
+        :icon-color="stat.iconColor"
+      />
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
@@ -80,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, computed, h, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { teacherApi } from '@/services/teacherApi'
 import { useTeacherToast } from '@/composables/useTeacherToast'
 import Breadcrumb from '@/components/ui/Breadcrumb.vue'
@@ -106,34 +107,23 @@ const initialsOf = (name) => {
   return String(name || '?').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
 }
 
-const IconCourse = () => ({
-  render: () => h('svg', { class: 'h-5 w-5', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', viewBox: '0 0 24 24' }, [
-    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25' }),
-  ]),
-})
-const IconLesson = () => ({
-  render: () => h('svg', { class: 'h-5 w-5', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', viewBox: '0 0 24 24' }, [
-    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25' }),
-  ]),
-})
-const IconStudent = () => ({
-  render: () => h('svg', { class: 'h-5 w-5', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', viewBox: '0 0 24 24' }, [
-    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.244m.972-4.346h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V11.75zm0-2.25h.008v.008h-.008v-.008zm-9.75 0h.008v.008H4.5v-.008zm0 2.25h.008v.008H4.5V11.75zm0-2.25h.008v.008H4.5v-.008zm9.75 0h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V11.75z' }),
-  ]),
-})
-const IconQuiz = () => ({
-  render: () => h('svg', { class: 'h-5 w-5', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', viewBox: '0 0 24 24' }, [
-    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z' }),
-  ]),
-})
+const iconCourse = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>`
+const iconLesson = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg>`
+const iconStudent = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.244m.972-4.346h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V11.75zm0-2.25h.008v.008h-.008v-.008zm-9.75 0h.008v.008H4.5v-.008zm0 2.25h.008v.008H4.5V11.75zm0-2.25h.008v.008H4.5v-.008zm9.75 0h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V11.75z" /></svg>`
+const iconQuiz = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>`
 
-const iconMap = [IconCourse, IconLesson, IconStudent, IconQuiz]
+const iconMap = [
+  { icon: iconCourse, iconBg: 'bg-[#cf3d3d]/10', iconColor: 'text-[#cf3d3d]' },
+  { icon: iconLesson, iconBg: 'bg-emerald-100', iconColor: 'text-emerald-600' },
+  { icon: iconStudent, iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
+  { icon: iconQuiz, iconBg: 'bg-amber-100', iconColor: 'text-amber-600' },
+]
 
 const fetchDashboard = async () => {
   try {
     const res = await teacherApi.dashboard()
     const d = res.data
-    stats.value = (d.stats || []).map((s, i) => ({ ...s, icon: iconMap[i] || IconCourse }))
+    stats.value = (d.stats || []).map((s, i) => ({ ...s, ...(iconMap[i] || iconMap[0]) }))
     courses.value = d.courses || []
     studentProgress.value = d.student_progress || []
   } catch (e) {
