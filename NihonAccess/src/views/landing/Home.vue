@@ -2,19 +2,28 @@
   <div class="min-h-screen bg-white font-sans text-slate-900 antialiased scroll-smooth">
     <Navbar />
 
-    <div v-if="pendingRegistration" class="fixed left-0 right-0 top-[56px] z-40 px-4 sm:top-[64px]">
-      <div class="mx-auto flex max-w-5xl flex-col gap-3 rounded-3xl border border-amber-200 bg-amber-50/95 p-4 shadow-lg shadow-amber-900/5 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p class="text-sm font-extrabold text-amber-900">Lanjutkan pembayaran sebelumnya?</p>
-          <p class="mt-1 text-xs leading-relaxed text-amber-700">
-            Pendaftaran {{ pendingRegistration.name }} untuk {{ pendingRegistration.package_name || pendingRegistration.packageType }} masih pending.
+    <div v-if="pendingRegistration" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="fixed inset-0 bg-slate-950/40 backdrop-blur-sm" @click="dismissReminder"></div>
+      
+      <div class="relative w-full max-w-md transform rounded-3xl  bg-white p-6 shadow-2xl transition-all animate-in fade-in zoom-in-95 duration-200">
+        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h.01M12 16h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+        </div>
+
+        <div class="mt-4 text-center">
+          <h3 class="text-lg font-extrabold text-slate-900">Lanjutkan Pembayaran?</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-600">
+            Pendaftaran <span class="font-semibold text-slate-900">{{ pendingRegistration.name }}</span> untuk <span class="font-semibold text-slate-900">{{ pendingRegistration.package_name || pendingRegistration.packageType }}</span> masih pending.
           </p>
         </div>
-        <div class="flex flex-col gap-2 sm:flex-row">
-          <button class="rounded-full bg-[#cf3d3d] px-5 py-2 text-xs font-extrabold text-white shadow-sm transition hover:bg-[#b83232]" @click="continuePayment">
+
+        <div class="mt-6 flex flex-col gap-2 sm:flex-row-reverse">
+          <button class="w-full rounded-full bg-[#cf3d3d] px-5 py-2.5 text-sm font-extrabold text-white shadow-sm transition hover:bg-[#b83232] sm:w-auto flex-1" @click="continuePayment">
             Lanjut Bayar
           </button>
-          <button class="rounded-full border border-amber-200 bg-white px-5 py-2 text-xs font-extrabold text-amber-700 transition hover:bg-amber-100" @click="dismissReminder">
+          <button class="w-full rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-extrabold text-slate-700 transition hover:bg-slate-50 sm:w-auto flex-1" @click="dismissReminder">
             Nanti Saja
           </button>
         </div>
