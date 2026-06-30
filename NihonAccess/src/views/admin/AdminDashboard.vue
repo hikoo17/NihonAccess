@@ -331,6 +331,7 @@ const fetchChartData = async () => {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     const data = await response.json().catch(() => ({}))
+    console.log(data)
 
     if (response.ok && data.success) {
       chart.value = data.data

@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('admin')->middleware('admin')->group(function () {
 
         Route::get('dashboard', [AdminController::class, 'dashboard']);
+        Route::get('chart-data', [AdminController::class, 'chartData']);
 
         Route::get('users', [AdminController::class, 'users']);
         Route::patch('users/{user}', [AdminController::class, 'updateUser']);
