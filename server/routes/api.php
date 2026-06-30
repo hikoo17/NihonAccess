@@ -26,7 +26,20 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+    Route::prefix('admin')->middleware('admin')->group(function () {
+        Route::get('dashboard', [AdminController::class, 'dashboard']);
+
+        Route::get('users', [AdminController::class, 'users']);
+        Route::patch('users/{user}', [AdminController::class, 'updateUser']);
+
+        Route::get('packages', [AdminController::class, 'packages']);
+        Route::patch('packages/{package}/toggle', [AdminController::class, 'togglePackage']);
+
+        Route::get('orders', [AdminController::class, 'orders']);
+
+        Route::get('profile', [AdminController::class, 'profile']);
+        Route::put('profile', [AdminController::class, 'updateProfile']);
+    });
 
     Route::prefix('teacher')->group(function () {
         Route::get('dashboard', [TeacherDashboardController::class, 'index']);

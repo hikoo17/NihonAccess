@@ -8,6 +8,10 @@ import TeacherDashboard from '../views/teacher/TeacherDashboard.vue'
 import TeacherLayout from '../views/teacher/TeacherLayout.vue'
 import AdminLayout from '../views/admin/AdminLayout.vue'
 import AdminDashboard from '../views/admin/AdminDashboard.vue'
+import AdminUsers from '../views/admin/AdminUsers.vue'
+import AdminPackages from '../views/admin/AdminPackages.vue'
+import AdminOrders from '../views/admin/AdminOrders.vue'
+// import AdminSettings from '../views/admin/AdminSettings.vue'
 const packageTitles = {
   basic: 'Paket Basic Online',
   premium: 'Paket Premium Online',
@@ -51,6 +55,10 @@ const routes = [
     children: [
       { path: '', redirect: { name: 'AdminDashboard' } },
       { path: 'dashboard', name: 'AdminDashboard', component: AdminDashboard, meta: { title: 'Dashboard | Admin' } },
+      { path: 'users', name: 'AdminUsers', component: AdminUsers, meta: { title: 'Manajemen User | Admin' } },
+      { path: 'packages', name: 'AdminPackages', component: AdminPackages, meta: { title: 'Manajemen Paket | Admin' } },
+      { path: 'orders', name: 'AdminOrders', component: AdminOrders, meta: { title: 'Pesanan & Pembayaran | Admin' } },
+      // { path: 'settings', name: 'AdminSettings', component: AdminSettings, meta: { title: 'Pengaturan | Admin' } },
     ]
   }, 
   {
