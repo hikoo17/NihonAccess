@@ -42,8 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('profile', [AdminController::class, 'updateProfile']);
     });
 
-    Route::prefix('teacher')
-    ->group(function () {
+    Route::prefix('teacher')->group(function () {
         Route::get('dashboard', [TeacherDashboardController::class, 'index']);
 
         Route::apiResource('courses', TeacherCourseController::class)->only(['index', 'show']);
