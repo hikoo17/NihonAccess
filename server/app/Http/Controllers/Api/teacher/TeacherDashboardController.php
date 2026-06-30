@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\Teacher;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\LessonProgress;
 use App\Models\Quiz;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TeacherDashboardController extends Controller
 {
@@ -16,71 +18,59 @@ class TeacherDashboardController extends Controller
     {
         $teacherId = $request->user()->id;
 
-        // 1. Ambil data statistik riil berdasarkan schema migrasi Anda
         $totalCourse = Course::where('teacher_id', $teacherId)->count();
-        
-        $totalLesson = Lesson::whereHas('course', function ($query) use ($teacherId) {
-            $query->where('teacher_id', $teacherId);
-        })->count();
 
-        $totalQuiz = Quiz::whereHas('course', function ($query) use ($teacherId) {
-            $query->where('teacher_id', $teacherId);
-        })->count();
+        $totalLesson = Lesson::whereHas('course', fn ($q) => $q->where('teacher_id', $teacherId))->count();
 
-        // Menghitung siswa unik yang ter-enroll ke paket yang berelasi dengan course guru ini
-        $totalSiswa = User::where('role', 'client')
-            ->whereHas('enrollments.package.courses', function ($query) use ($teacherId) {
-                $query->where('teacher_id', $teacherId);
-            })->count();
+        $totalQuiz = Quiz::whereHas('course', fn ($q) => $q->where('teacher_id', $teacherId))->count();
 
-        // 2. Ambil data "Course saya" - Konversi boolean is_active ke teks untuk FE
+        $totalSiswa = DB::table('users')
+            ->where('users.role', 'client')
+            ->join('enrollments', 'enrollments.user_id', '=', 'users.id')
+            ->join('course_package', 'course_package.package_id', '=', 'enrollments.package_id')
+            ->join('courses', 'courses.id', '=', 'course_package.course_id')
+            ->where('courses.teacher_id', $teacherId)
+            ->distinct()
+            ->count('users.id');
+
         $courses = Course::where('teacher_id', $teacherId)
             ->withCount('lessons')
             ->latest()
             ->take(5)
             ->get()
-            ->map(function ($course) {
-                return [
-                    'title' => $course->title,
-                    'lessons_count' => $course->lessons_count,
-                    'status' => $course->is_active ? 'Aktif' : 'Non-Aktif',
-                ];
-            });
+            ->map(fn ($c) => [
+                'id'            => $c->id,
+                'title'         => $c->title,
+                'lessons_count' => $c->lessons_count,
+                'is_active'     => $c->is_active,
+            ]);
 
-        // 3. Data Progress Siswa (Jika data riil kosong, berikan Mock agar UI terisi sesuai gambar)
-        // Di masa depan, ini bisa dihitung dari tabel `lesson_progress` Anda
-        $studentProgress = [
-            [
-                'initials' => 'AS',
-                'name' => 'Andi S.',
-                'course' => 'Hiragana dasar',
-                'percentage' => 75
-            ],
-            [
-                'initials' => 'RN',
-                'name' => 'Rina N.',
-                'course' => 'Katakana dasar',
-                'percentage' => 40
-            ]
-        ];
+        // Progress siswa dari DB, bukan hardcode
+        $studentProgress = LessonProgress::query()
+            ->with(['user:id,name', 'lesson.course:id,title,teacher_id'])
+            ->whereHas('lesson.course', fn ($q) => $q->where('teacher_id', $teacherId))
+            ->latest('updated_at')
+            ->take(5)
+            ->get()
+            ->map(fn ($lp) => [
+                'name'       => $lp->user?->name ?? '-',
+                'course'     => $lp->lesson?->course?->title ?? '-',
+                'percentage' => $lp->is_completed ? 100 : 0,
+            ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data dashboard berhasil diambil.',
-            'data' => [
+            'data'    => [
                 'stats' => [
-                    ['label' => 'Total course', 'value' => $totalCourse ?: 4],
-                    ['label' => 'Total lesson', 'value' => $totalLesson ?: 32],
-                    ['label' => 'Siswa aktif', 'value' => $totalSiswa ?: 87],
-                    ['label' => 'Quiz dibuat', 'value' => $totalQuiz ?: 12],
+                    ['label' => 'Total course',  'value' => $totalCourse],
+                    ['label' => 'Total lesson',  'value' => $totalLesson],
+                    ['label' => 'Siswa aktif',   'value' => $totalSiswa],
+                    ['label' => 'Quiz dibuat',   'value' => $totalQuiz],
                 ],
-                'courses' => $courses->isEmpty() ? [
-                    ['title' => 'Hiragana dasar', 'lessons_count' => 8, 'status' => 'Aktif'],
-                    ['title' => 'Katakana dasar', 'lessons_count' => 6, 'status' => 'Aktif'],
-                    ['title' => 'Kanji N5', 'lessons_count' => 10, 'status' => 'Non-Aktif']
-                ] : $courses,
-                'student_progress' => $studentProgress
-            ]
+                'courses'          => $courses,
+                'student_progress' => $studentProgress,
+            ],
         ]);
     }
-}   
+}

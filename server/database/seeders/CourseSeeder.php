@@ -8,6 +8,7 @@ use App\Models\ListeningExercise;
 use App\Models\Package;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
+use App\Models\User;
 use App\Models\WritingExercise;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -16,6 +17,9 @@ class CourseSeeder extends Seeder
 {
     public function run(): void
     {
+        $teacher = User::where('role', 'teacher')->first();
+        $teacherId = $teacher?->id;
+
         $courses = [
             [
                 'title' => 'Hiragana & Katakana Dasar',
@@ -130,7 +134,7 @@ class CourseSeeder extends Seeder
             $packageSlugs = $data['packages'] ?? [];
             unset($data['lessons'], $data['quizzes'], $data['listening'], $data['characters'], $data['writing'], $data['packages']);
 
-            $course = Course::create(array_merge($data, ['is_active' => true]));
+            $course = Course::create(array_merge($data, ['is_active' => true, 'teacher_id' => $teacherId]));
 
             $packageIds = Package::whereIn('slug', $packageSlugs)->pluck('id');
             $course->packages()->attach($packageIds);

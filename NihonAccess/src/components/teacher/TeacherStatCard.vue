@@ -1,13 +1,22 @@
 <template>
-  <div class="bg-[#1a1a1a] p-6 rounded-2xl border border-zinc-800/40 shadow-xl">
-    <p class="text-xs font-semibold text-zinc-500 tracking-wide uppercase">{{ label }}</p>
-    <p class="text-3xl font-bold text-zinc-100 mt-2 tracking-tight tabular-nums">{{ value }}</p>
+  <div class="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm sm:p-6">
+    <div class="flex items-start justify-between gap-4">
+      <div class="min-w-0">
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ label }}</p>
+        <p class="mt-2 text-3xl font-extrabold tracking-tight text-slate-800 tabular-nums">{{ value }}</p>
+        <p v-if="subtitle" class="mt-1 text-xs font-medium text-slate-400">{{ subtitle }}</p>
+      </div>
+      <div v-if="$slots.icon" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#cf3d3d]/10 text-[#cf3d3d]">
+        <slot name="icon" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 defineProps({
   label: { type: String, required: true },
-  value: { type: [String, Number], required: true }
+  value: { type: [String, Number], required: true },
+  subtitle: { type: String, default: '' },
 })
 </script>

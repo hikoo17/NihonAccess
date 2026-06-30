@@ -1,147 +1,151 @@
 <template>
-  <div class="space-y-8 animate-fadeIn">
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-      <TeacherStatCard 
-        v-for="(stat, index) in summaryStats" 
+  <div class="animate-fadeIn space-y-8">
+    <div>
+      <span class="inline-flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.22em] text-[#cf3d3d]">
+        <span class="h-px w-8 bg-[#cf3d3d]"></span>Dashboard
+      </span>
+      <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">Selamat datang, {{ firstName }} 👋</h1>
+      <p class="mt-1 text-sm font-medium text-slate-500">Ringkasan aktivitas mengajar Anda hari ini.</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <TeacherStatCard
+        v-for="(stat, index) in stats"
         :key="index"
         :label="stat.label"
         :value="stat.value"
-      />
+      >
+        <template #icon><component :is="stat.icon" /></template>
+      </TeacherStatCard>
     </div>
 
-    <div class="bg-[#1a1a1a] rounded-2xl border border-zinc-800/40 shadow-xl overflow-hidden">
-      <div class="p-5 px-6 flex items-center justify-between border-b border-zinc-800/60">
-        <h3 class="text-sm font-semibold text-zinc-200">Course saya</h3>
-        <router-link :to="{ name: 'TeacherCourses' }" class="text-xs font-semibold px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800/80 transition-all">
-          Lihat semua
-        </router-link>
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
+      <div class="rounded-3xl border border-slate-100 bg-white shadow-sm lg:col-span-3">
+        <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+          <h3 class="text-base font-extrabold text-slate-900">Course Terbaru</h3>
+          <router-link :to="{ name: 'TeacherCourses' }" class="text-sm font-bold text-[#cf3d3d] transition-colors hover:text-[#b83232]">
+            Lihat semua →
+          </router-link>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="border-b border-slate-200">
+                <th class="px-6 py-3 text-xs font-bold uppercase tracking-wider text-slate-400">Judul</th>
+                <th class="px-6 py-3 text-xs font-bold uppercase tracking-wider text-slate-400">Lesson</th>
+                <th class="px-6 py-3 text-xs font-bold uppercase tracking-wider text-slate-400">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-sm">
+              <tr v-for="(course, idx) in courses" :key="idx" class="transition-colors hover:bg-slate-50/70">
+                <td class="px-6 py-4 font-bold text-slate-800">{{ course.title }}</td>
+                <td class="px-6 py-4 font-medium text-slate-500">{{ course.lessons_count }} lesson</td>
+                <td class="px-6 py-4"><TeacherStatusBadge :active="course.is_active" /></td>
+              </tr>
+              <tr v-if="courses.length === 0">
+                <td colspan="3" class="px-6 py-10 text-center text-sm font-medium text-slate-400">Belum ada course.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="text-xs font-semibold text-zinc-500 border-b border-zinc-800/50 bg-zinc-900/10">
-              <th class="p-4 px-6">Judul</th>
-              <th class="p-4 px-6">Lesson</th>
-              <th class="p-4 px-6">Status</th>
-              <th class="p-4 px-6 text-right">Aksi</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-800/50 text-sm">
-            <tr v-for="(course, idx) in myCourses" :key="idx" class="hover:bg-zinc-800/20 transition-colors">
-              <td class="p-4 px-6 font-medium text-zinc-200">{{ course.title }}</td>
-              <td class="p-4 px-6 text-zinc-400 font-medium">{{ course.lessons_count }} lesson</td>
-              <td class="p-4 px-6">
-                <span :class="[
-                  'px-3 py-1 rounded-full text-xs font-bold tracking-wide shadow-sm',
-                  course.status === 'Aktif' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/10' : 'bg-amber-500/10 text-amber-500 border border-amber-500/10'
-                ]">
-                  {{ course.status }}
-                </span>
-              </td>
-              <td class="p-4 px-6 text-right">
-                <button class="p-1.5 rounded-lg bg-zinc-900 border border-zinc-800/60 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-all">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <div class="bg-[#1a1a1a] rounded-2xl border border-zinc-800/40 shadow-xl overflow-hidden">
-      <div class="p-5 px-6 flex items-center justify-between border-b border-zinc-800/60">
-        <h3 class="text-sm font-semibold text-zinc-200">Progress siswa terbaru</h3>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="text-xs font-semibold text-zinc-500 border-b border-zinc-800/50 bg-zinc-900/10">
-              <th class="p-4 px-6">Siswa</th>
-              <th class="p-4 px-6">Course</th>
-              <th class="p-4 px-6">Progress</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-800/50 text-sm">
-            <tr v-for="(student, sIdx) in studentProgress" :key="sIdx" class="hover:bg-zinc-800/20 transition-colors">
-              <td class="p-4 px-6">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-xs font-bold text-blue-400">
-                    {{ student.initials }}
+      <div class="rounded-3xl border border-slate-100 bg-white shadow-sm lg:col-span-2">
+        <div class="border-b border-slate-100 px-6 py-4">
+          <h3 class="text-base font-extrabold text-slate-900">Progress Siswa Terbaru</h3>
+        </div>
+        <div class="p-6">
+          <div v-if="studentProgress.length === 0" class="py-8 text-center text-sm font-medium text-slate-400">Belum ada progress siswa.</div>
+          <div v-else class="space-y-5">
+            <div v-for="(student, idx) in studentProgress" :key="idx">
+              <div class="mb-1.5 flex items-center justify-between gap-3">
+                <div class="flex min-w-0 items-center gap-2.5">
+                  <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#cf3d3d]/10 text-xs font-bold text-[#cf3d3d]">
+                    {{ initialsOf(student.name) }}
+                  </span>
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-bold text-slate-800">{{ student.name }}</p>
+                    <p class="truncate text-xs font-medium text-slate-400">{{ student.course }}</p>
                   </div>
-                  <span class="font-medium text-zinc-200">{{ student.name }}</span>
                 </div>
-              </td>
-              <td class="p-4 px-6 text-zinc-300 font-medium">{{ student.course }}</td>
-              <td class="p-4 px-6">
-                <div class="flex items-center gap-4 max-w-[240px]">
-                  <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
-                    <div class="bg-blue-600 h-full rounded-full transition-all duration-500" :style="{ width: `${student.percentage}%` }"></div>
-                  </div>
-                  <span class="text-xs font-bold text-zinc-400 w-8 text-right tabular-nums">{{ student.percentage }}%</span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <span class="text-xs font-bold text-slate-500 tabular-nums">{{ student.percentage }}%</span>
+              </div>
+              <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div class="h-full rounded-full bg-gradient-to-r from-[#cf3d3d] to-[#e85555] transition-all duration-500" :style="{ width: `${student.percentage}%` }"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, computed, h, onMounted } from 'vue'
+import { teacherApi } from '@/services/teacherApi'
+import { useTeacherToast } from '@/composables/useTeacherToast'
 import TeacherStatCard from '@/components/teacher/TeacherStatCard.vue'
+import TeacherStatusBadge from '@/components/teacher/ui/TeacherStatusBadge.vue'
 
-const summaryStats = ref([])
-const myCourses = ref([])
+const { error } = useTeacherToast()
+
+const stats = ref([])
+const courses = ref([])
 const studentProgress = ref([])
 
-const fetchDashboardData = async () => {
+const firstName = computed(() => {
   try {
-    const response = await axios.get('/api/teacher/dashboard')
-    if (response.data.success) {
-      summaryStats.value = response.data.data.stats
-      myCourses.value = response.data.data.courses
-      studentProgress.value = response.data.data.student_progress
-    }
-  } catch (error) {
-    console.error('Terjadi kesalahan muat data:', error)
-    // Fallback data statis jika API belum siap / token expired
-    summaryStats.value = [
-      { label: 'Total course', value: 4 },
-      { label: 'Total lesson', value: 32 },
-      { label: 'Siswa aktif', value: 87 },
-      { label: 'Quiz dibuat', value: 12 }
-    ]
-    myCourses.value = [
-      { title: 'Hiragana dasar', lessons_count: 8, status: 'Aktif' },
-      { title: 'Katakana dasar', lessons_count: 6, status: 'Aktif' },
-      { title: 'Kanji N5', lessons_count: 10, status: 'Non-Aktif' }
-    ]
-    studentProgress.value = [
-      { initials: 'AS', name: 'Andi S.', course: 'Hiragana dasar', percentage: 75 },
-      { initials: 'RN', name: 'Rina N.', course: 'Katakana dasar', percentage: 40 }
-    ]
+    const data = JSON.parse(localStorage.getItem('user_data') || '{}')
+    return (data.name || 'Guru').split(' ')[0]
+  } catch {
+    return 'Guru'
+  }
+})
+
+const initialsOf = (name) => {
+  return String(name || '?').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
+}
+
+const IconCourse = () => ({
+  render: () => h('svg', { class: 'h-5 w-5', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', viewBox: '0 0 24 24' }, [
+    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25' }),
+  ]),
+})
+const IconLesson = () => ({
+  render: () => h('svg', { class: 'h-5 w-5', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', viewBox: '0 0 24 24' }, [
+    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25' }),
+  ]),
+})
+const IconStudent = () => ({
+  render: () => h('svg', { class: 'h-5 w-5', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', viewBox: '0 0 24 24' }, [
+    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.244m.972-4.346h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V11.75zm0-2.25h.008v.008h-.008v-.008zm-9.75 0h.008v.008H4.5v-.008zm0 2.25h.008v.008H4.5V11.75zm0-2.25h.008v.008H4.5v-.008zm9.75 0h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V11.75z' }),
+  ]),
+})
+const IconQuiz = () => ({
+  render: () => h('svg', { class: 'h-5 w-5', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', viewBox: '0 0 24 24' }, [
+    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z' }),
+  ]),
+})
+
+const iconMap = [IconCourse, IconLesson, IconStudent, IconQuiz]
+
+const fetchDashboard = async () => {
+  try {
+    const res = await teacherApi.dashboard()
+    const d = res.data
+    stats.value = (d.stats || []).map((s, i) => ({ ...s, icon: iconMap[i] || IconCourse }))
+    courses.value = d.courses || []
+    studentProgress.value = d.student_progress || []
+  } catch (e) {
+    error(e.message || 'Gagal memuat data dashboard.')
   }
 }
 
-onMounted(() => {
-  fetchDashboardData()
-})
+onMounted(fetchDashboard)
 </script>
 
 <style scoped>
-.animate-fadeIn {
-  animation: fadeIn 0.35s ease-out forwards;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+.animate-fadeIn { animation: fadeIn 0.35s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 </style>
