@@ -104,20 +104,22 @@ class AdminController extends Controller
         $perPage = max(1, min(50, (int) $request->input('per_page', 10)));
         $users = $query->paginate($perPage);
 
+        $data = $users->getCollection()->map(fn ($user) => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'whatsapp' => $user->whatsapp,
+            'username' => $user->username,
+            'role' => $user->role,
+            'is_active' => $user->is_active,
+            'email_verified_at' => $user->email_verified_at,
+            'created_at' => $user->created_at?->diffForHumans(),
+            'created_at_raw' => $user->created_at?->toDateTimeString(),
+        ])->values();
+
         return response()->json([
             'success' => true,
-            'data' => $users->through(fn ($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'whatsapp' => $user->whatsapp,
-                'username' => $user->username,
-                'role' => $user->role,
-                'is_active' => $user->is_active,
-                'email_verified_at' => $user->email_verified_at,
-                'created_at' => $user->created_at?->diffForHumans(),
-                'created_at_raw' => $user->created_at?->toDateTimeString(),
-            ]),
+            'data' => $data,
             'meta' => [
                 'current_page' => $users->currentPage(),
                 'last_page' => $users->lastPage(),
@@ -229,26 +231,94 @@ class AdminController extends Controller
         $perPage = max(1, min(50, (int) $request->input('per_page', 10)));
         $orders = $query->paginate($perPage);
 
+        $data = $orders->getCollection()->map(fn ($order) => [
+            'id' => $order->id,
+            'order_number' => $order->order_number,
+            'user_name' => $order->user?->name,
+            'user_email' => $order->user?->email,
+            'package_name' => $order->package?->name,
+            'amount' => $order->amount,
+            'amount_formatted' => 'Rp' . number_format((float) $order->amount, 0, ',', '.'),
+            'status' => $order->status,
+            'paid_at' => $order->paid_at?->toDateTimeString(),
+            'created_at' => $order->created_at->diffForHumans(),
+            'created_at_raw' => $order->created_at->toDateTimeString(),
+        ])->values();
+
         return response()->json([
             'success' => true,
-            'data' => $orders->through(fn ($order) => [
-                'id' => $order->id,
-                'order_number' => $order->order_number,
-                'user_name' => $order->user?->name,
-                'user_email' => $order->user?->email,
-                'package_name' => $order->package?->name,
-                'amount' => $order->amount,
-                'amount_formatted' => 'Rp' . number_format((float) $order->amount, 0, ',', '.'),
-                'status' => $order->status,
-                'paid_at' => $order->paid_at?->toDateTimeString(),
-                'created_at' => $order->created_at->diffForHumans(),
-                'created_at_raw' => $order->created_at->toDateTimeString(),
-            ]),
+            'data' => $data,
             'meta' => [
                 'current_page' => $orders->currentPage(),
                 'last_page' => $orders->lastPage(),
                 'per_page' => $orders->perPage(),
                 'total' => $orders->total(),
+            ],
+        ]);
+    }
+
+    public function chartData(Request $request): JsonResponse
+    {
+        $period = $request->query('period', 'month');
+
+        if ($period === 'day') {
+            $periods = collect(range(6, 0))->map(fn ($i) => now()->subDays($i)->startOfDay());
+            $labelFormat = 'd M';
+        } elseif ($period === 'week') {
+            $periods = collect(range(5, 0))->map(fn ($i) => now()->subWeeks($i)->startOfWeek());
+            $labelFormat = 'd M';
+        } else {
+            $periods = collect(range(5, 0))->map(fn ($i) => now()->subMonths($i)->startOfMonth());
+            $labelFormat = 'M';
+        }
+
+        $ordersSeries = $periods->map(function ($p) use ($period, $labelFormat) {
+            $count = $period === 'day'
+                ? Order::whereDate('created_at', $p->toDateString())->count()
+                : Order::whereBetween('created_at', [$p, $period === 'week' ? $p->copy()->endOfWeek() : $p->copy()->endOfMonth()])->count();
+
+            return [
+                'label' => $p->format($labelFormat),
+                'orders' => $count,
+            ];
+        });
+
+        $revenueSeries = $periods->map(function ($p) use ($period, $labelFormat) {
+            $query = Order::where('status', 'paid');
+
+            if ($period === 'day') {
+                $query->whereDate('paid_at', $p->toDateString());
+            } else {
+                $query->whereBetween('paid_at', [$p, $period === 'week' ? $p->copy()->endOfWeek() : $p->copy()->endOfMonth()]);
+            }
+
+            return [
+                'label' => $p->format($labelFormat),
+                'revenue' => (float) $query->sum('amount'),
+            ];
+        });
+
+        $roleDistribution = [
+            ['label' => 'Client', 'value' => User::where('role', 'client')->count()],
+            ['label' => 'Teacher', 'value' => User::where('role', 'teacher')->count()],
+            ['label' => 'Admin', 'value' => User::where('role', 'admin')->count()],
+        ];
+
+        $statusDistribution = [
+            ['label' => 'Dibayar', 'value' => Order::where('status', 'paid')->count()],
+            ['label' => 'Pending', 'value' => Order::where('status', 'pending')->count()],
+            ['label' => 'Expired', 'value' => Order::where('status', 'expired')->count()],
+            ['label' => 'Lainnya', 'value' => Order::whereIn('status', ['failed', 'cancelled'])->count()],
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'months' => $ordersSeries->pluck('label'),
+                'orders' => $ordersSeries->pluck('orders'),
+                'revenue' => $revenueSeries->pluck('revenue'),
+                'role_distribution' => $roleDistribution,
+                'status_distribution' => $statusDistribution,
             ],
         ]);
     }

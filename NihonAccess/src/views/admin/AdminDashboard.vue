@@ -16,6 +16,56 @@
         />
       </div>
 
+      <!-- Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-800">Tren Pesanan & Pendapatan</h3>
+              <p class="text-xs text-slate-400">{{ periodSubtitle }}</p>
+            </div>
+            <div class="inline-flex rounded-xl bg-slate-100 p-1">
+              <button
+                v-for="opt in periodOptions"
+                :key="opt.value"
+                type="button"
+                :disabled="chartLoading"
+                @click="changePeriod(opt.value)"
+                :class="[
+                  'px-3 py-1.5 text-xs font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed',
+                  chartPeriod === opt.value
+                    ? 'bg-white text-[#cf3d3d] shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                ]"
+              >
+                {{ opt.label }}
+              </button>
+            </div>
+          </div>
+          <apexchart
+            v-if="trendSeries.length"
+            type="area"
+            height="280"
+            :options="trendChartOptions"
+            :series="trendSeries"
+          />
+          <div v-else class="flex h-[280px] items-center justify-center text-sm text-slate-400">Memuat grafik...</div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+          <h3 class="mb-1 text-sm font-bold text-slate-800">Distribusi User</h3>
+          <p class="mb-2 text-xs text-slate-400">Berdasarkan role</p>
+          <apexchart
+            v-if="roleSeries.length"
+            type="donut"
+            height="280"
+            :options="roleChartOptions"
+            :series="roleSeries"
+          />
+          <div v-else class="flex h-[280px] items-center justify-center text-sm text-slate-400">Memuat grafik...</div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
           <h3 class="text-sm font-bold text-slate-800 mb-5">Ringkasan User</h3>
@@ -158,7 +208,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import AdminStatCard from '@/components/admin/AdminStatCard.vue'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
@@ -170,6 +220,26 @@ const orderSummary = ref({ total: 0, paid: 0, pending: 0, expired: 0 })
 const totalPackages = ref(0)
 const recentOrders = ref([])
 const recentUsers = ref([])
+
+const chart = ref({ months: [], orders: [], revenue: [], role_distribution: [], status_distribution: [] })
+
+const chartPeriod = ref('month')
+const chartLoading = ref(false)
+const periodOptions = [
+  { value: 'day', label: 'Hari' },
+  { value: 'week', label: 'Minggu' },
+  { value: 'month', label: 'Bulan' },
+]
+const periodSubtitle = computed(() => {
+  const map = { day: '7 hari terakhir', week: '6 minggu terakhir', month: '6 bulan terakhir' }
+  return map[chartPeriod.value] || ''
+})
+
+const changePeriod = async (period) => {
+  if (chartPeriod.value === period || chartLoading.value) return
+  chartPeriod.value = period
+  await fetchChartData()
+}
 
 const formatNumber = (value) => {
   return Number(value).toLocaleString('id-ID')
@@ -194,6 +264,39 @@ const roleBadge = (role) => {
   }
   return map[role] || 'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500'
 }
+
+const trendSeries = computed(() => {
+  if (!chart.value.months.length) return []
+  return [
+    { name: 'Pesanan', data: chart.value.orders },
+    { name: 'Pendapatan (Rp ribu)', data: chart.value.revenue.map((v) => Math.round(v / 1000)) },
+  ]
+})
+
+const trendChartOptions = computed(() => ({
+  chart: { toolbar: { show: false }, fontFamily: 'Inter, sans-serif', foreColor: '#94a3b8' },
+  colors: ['#cf3d3d', '#3b82f6'],
+  dataLabels: { enabled: false },
+  stroke: { curve: 'smooth', width: [3, 2] },
+  fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: [0.35, 0.15], opacityTo: [0.05, 0], stops: [0, 90] } },
+  grid: { borderColor: '#f1f5f9', strokeDashArray: 4 },
+  xaxis: { categories: chart.value.months, axisBorder: { show: false }, axisTicks: { show: false } },
+  yaxis: [{ labels: { style: { colors: '#94a3b8' } } }, { opposite: true, labels: { style: { colors: '#94a3b8' } } }],
+  legend: { position: 'top', horizontalAlign: 'right', fontWeight: 700, fontSize: '12px' },
+  tooltip: { shared: true },
+}))
+
+const roleSeries = computed(() => chart.value.role_distribution.map((r) => r.value))
+
+const roleChartOptions = computed(() => ({
+  chart: { fontFamily: 'Inter, sans-serif' },
+  labels: chart.value.role_distribution.map((r) => r.label),
+  colors: ['#cf3d3d', '#3b82f6', '#f59e0b'],
+  legend: { position: 'bottom', fontWeight: 700, fontSize: '12px' },
+  dataLabels: { enabled: true, style: { fontWeight: 700 } },
+  plotOptions: { pie: { donut: { size: '68%' } } },
+  stroke: { width: 0 },
+}))
 
 const fetchDashboard = async () => {
   try {
@@ -220,8 +323,28 @@ const fetchDashboard = async () => {
   }
 }
 
+const fetchChartData = async () => {
+  chartLoading.value = true
+  try {
+    const token = localStorage.getItem('auth_token')
+    const response = await fetch(`${apiBaseUrl}/api/admin/chart-data?period=${chartPeriod.value}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    const data = await response.json().catch(() => ({}))
+
+    if (response.ok && data.success) {
+      chart.value = data.data
+    }
+  } catch (error) {
+    console.error('Gagal memuat data chart:', error)
+  } finally {
+    chartLoading.value = false
+  }
+}
+
 onMounted(() => {
   fetchDashboard()
+  fetchChartData()
 })
 </script>
 
