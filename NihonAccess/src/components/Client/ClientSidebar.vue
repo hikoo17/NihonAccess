@@ -94,8 +94,8 @@ const iconProfile = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox
 const mainMenu = [
   { name: 'dashboard', to: '/client/dashboard', label: 'Dashboard', icon: iconDashboard },
   { name: 'courses', to: '/client/my-courses', label: 'Kursus Saya', icon: iconCourses },
-  { name: 'packages', to: '/client/packages', label: 'Beli Paket', icon: iconPackages },
-  { name: 'orders', to: '/client/orders', label: 'Riwayat Pesanan', icon: iconOrders },
+  // { name: 'packages', to: '/client/packages', label: 'Beli Paket', icon: iconPackages },
+  // { name: 'orders', to: '/client/orders', label: 'Riwayat Pesanan', icon: iconOrders },
 ]
 
 const accountMenu = [

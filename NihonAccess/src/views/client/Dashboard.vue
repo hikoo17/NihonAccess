@@ -98,7 +98,7 @@
       </div>
     </div>
 
-    <div>
+    <!-- <div>
       <div class="mb-4 flex items-center justify-between">
         <h2 class="text-lg font-extrabold text-slate-800">Pesanan Terbaru</h2>
         <RouterLink
@@ -139,7 +139,7 @@
           </div>
         </div>
       </Card>
-    </div>
+    </div> -->
   </div>
 </template>
 

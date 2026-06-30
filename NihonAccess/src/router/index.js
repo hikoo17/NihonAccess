@@ -68,6 +68,8 @@ const routes = [
       { path: 'payment-status/:orderId', name: 'client-payment-status', component: () => import('@/views/client/PaymentStatus.vue'), props: true, meta: { title: 'Status Pembayaran | Client' } },
       { path: 'orders', name: 'client-orders', component: () => import('@/views/client/OrderHistory.vue'), meta: { title: 'Riwayat Pesanan | Client' } },
       { path: 'profile', name: 'client-profile', component: () => import('@/views/client/Profile.vue'), meta: { title: 'Profil Saya | Client' } },
+      { path: 'my-courses/:id/quiz', name: 'client-quiz', component: () => import('@/views/client/QuizView.vue'), props: true, meta: { title: 'Quiz | Client' } },
+      { path: 'my-courses/:id/quiz/result', name: 'client-quiz-result', component: () => import('@/views/client/QuizResult.vue'), props: true, meta: { title: 'Hasil Quiz | Client' } },
     ],
   }
 
