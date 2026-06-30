@@ -196,18 +196,17 @@ const fetchUsers = async (page = meta.value.current_page) => {
       headers: { Authorization: `Bearer ${token}` },
     })
     const data = await res.json().catch(() => ({}))
-    console.log(data)
 
- if (res.ok && data.success) {
-  // Ambil array user dari data.data.data
-  users.value = data.data.data || []
+if (res.ok && data.success) {
+  // Ambil array user langsung dari data.data
+  users.value = data.data || []
   
-  // Ambil meta dari data.meta jika ada, atau fallback ke properti di data.data
+  // Ambil meta dari data.meta
   meta.value = data.meta || {
-    current_page: data.data.current_page || 1,
-    last_page: data.data.last_page || 1,
-    per_page: data.data.per_page || 10,
-    total: data.data.total || 0
+    current_page: 1,
+    last_page: 1,
+    per_page: 10,
+    total: 0
   }
 } else {
   flash('error', data.message || 'Gagal memuat data user.')

@@ -220,23 +220,21 @@ const fetchOrders = async (page = meta.value.current_page) => {
       },
     );
     const data = await res.json().catch(() => ({}));
-    console.log(data);
 
-    if (res.ok && data.success) {
-      // Ambil array dari data.data.data
-      orders.value = data.data.data || [];
-
-      // Jika API kamu sudah melempar data.meta secara terpisah, gunakan data.meta.
-      // Tapi kalau data.meta dari API ternyata kosong, kamu bisa fallback ke data.data.
-      meta.value = data.meta || {
-        current_page: data.data.current_page,
-        last_page: data.data.last_page,
-        per_page: data.data.per_page,
-        total: data.data.total,
-      };
-    } else {
-      flash("error", data.message || "Gagal memuat pesanan.");
-    }
+if (res.ok && data.success) {
+  // Ambil array user langsung dari data.data
+  orders.value = data.data || []
+  
+  // Ambil meta dari data.meta
+  meta.value = data.meta || {
+    current_page: 1,
+    last_page: 1,
+    per_page: 10,
+    total: 0
+  }
+} else {
+  flash('error', data.message || 'Gagal memuat data user.')
+}
   } catch (e) {
     console.error("Gagal memuat pesanan:", e);
   } finally {
