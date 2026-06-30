@@ -2,11 +2,21 @@
   <div class="w-full">
     <div class="flex items-center justify-between mb-1.5" v-if="showLabel">
       <span class="text-xs font-bold text-slate-500"><slot>Progress</slot></span>
-      <span class="text-xs font-extrabold text-[#cf3d3d]">{{ percent }}%</span>
+      <!-- MODIFIKASI: Menggunakan :class dinamis untuk warna teks -->
+      <span 
+        class="text-xs font-extrabold transition-colors duration-300"
+        :class="percent === 100 ? 'text-emerald-600' : 'text-[#cf3d3d]'"
+      >
+        {{ percent }}%
+      </span>
     </div>
     <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+      <!-- MODIFIKASI: Menggunakan :class dinamis untuk warna gradasi bar -->
       <div
-        class="h-full rounded-full bg-gradient-to-r from-[#cf3d3d] to-[#e85555] transition-all duration-500"
+        class="h-full rounded-full transition-all duration-500"
+        :class="percent === 100 
+          ? 'bg-gradient-to-r from-emerald-500 to-teal-500' 
+          : 'bg-gradient-to-r from-[#cf3d3d] to-[#e85555]'"
         :style="{ width: `${clampedPercent}%` }"
       />
     </div>

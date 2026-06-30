@@ -43,9 +43,9 @@
       </div>
 
       <div class="flex items-center gap-4">
-        <RouterLink to="/client/my-courses" class="text-xs font-bold text-slate-400 hover:text-[#cf3d3d] transition-colors">
+        <!-- <RouterLink to="/client/my-courses" class="text-xs font-bold text-slate-400 hover:text-[#cf3d3d] transition-colors">
           Detail
-        </RouterLink>
+        </RouterLink> -->
         <RouterLink
           v-if="course.status === 'active'"
           :to="`/client/my-courses/${course.id}/learn`"
@@ -53,7 +53,7 @@
         >
           Lanjutkan →
         </RouterLink>
-        <span v-else class="text-xs font-bold text-slate-400">{{ badgeLabel }}</span>
+        <!-- <span v-else class="text-xs font-bold text-slate-400">{{ badgeLabel }}</span> -->
       </div>
     </div>
   </Card>
