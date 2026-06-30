@@ -1,8 +1,8 @@
 <template>
-  <div class="space-y-8 animate-fadeIn">
+  <div class="mx-auto max-w-7xl space-y-8 animate-fadeIn">
 
     <div v-if="isLoading" class="flex items-center justify-center py-24">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-[#cf3d3d]"></div>
+      <div class="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#cf3d3d]"></div>
     </div>
 
     <template v-else>
@@ -12,74 +12,74 @@
           :key="index"
           :label="stat.label"
           :value="stat.value"
-          :value-class="index === 1 ? 'text-[#cf3d3d]' : 'text-zinc-100'"
+          :value-class="index === 1 ? 'text-[#cf3d3d]' : 'text-slate-800'"
         />
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="bg-[#1a1a1a] rounded-2xl border border-zinc-800/40 shadow-xl p-6">
-          <h3 class="text-sm font-semibold text-zinc-200 mb-5">Ringkasan User</h3>
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+          <h3 class="text-sm font-bold text-slate-800 mb-5">Ringkasan User</h3>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <span class="text-sm text-zinc-400">Total User</span>
-              <span class="text-lg font-bold text-zinc-100">{{ userSummary.total }}</span>
+              <span class="text-sm text-slate-500">Total User</span>
+              <span class="text-lg font-extrabold text-slate-800">{{ userSummary.total }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-zinc-400">Siswa (Client)</span>
-              <span class="text-lg font-bold text-zinc-100">{{ userSummary.client }}</span>
+              <span class="text-sm text-slate-500">Siswa (Client)</span>
+              <span class="text-lg font-extrabold text-slate-800">{{ userSummary.client }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-zinc-400">Pengajar (Teacher)</span>
-              <span class="text-lg font-bold text-zinc-100">{{ userSummary.teacher }}</span>
+              <span class="text-sm text-slate-500">Pengajar (Teacher)</span>
+              <span class="text-lg font-extrabold text-slate-800">{{ userSummary.teacher }}</span>
             </div>
           </div>
         </div>
 
-        <div class="bg-[#1a1a1a] rounded-2xl border border-zinc-800/40 shadow-xl p-6">
-          <h3 class="text-sm font-semibold text-zinc-200 mb-5">Ringkasan Pesanan</h3>
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+          <h3 class="text-sm font-bold text-slate-800 mb-5">Ringkasan Pesanan</h3>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <span class="text-sm text-zinc-400">Total Pesanan</span>
-              <span class="text-lg font-bold text-zinc-100">{{ orderSummary.total }}</span>
+              <span class="text-sm text-slate-500">Total Pesanan</span>
+              <span class="text-lg font-extrabold text-slate-800">{{ orderSummary.total }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-zinc-400">Dibayar</span>
-              <span class="text-lg font-bold text-emerald-500">{{ orderSummary.paid }}</span>
+              <span class="text-sm text-slate-500">Dibayar</span>
+              <span class="text-lg font-extrabold text-emerald-600">{{ orderSummary.paid }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-zinc-400">Pending</span>
-              <span class="text-lg font-bold text-amber-500">{{ orderSummary.pending }}</span>
+              <span class="text-sm text-slate-500">Pending</span>
+              <span class="text-lg font-extrabold text-amber-600">{{ orderSummary.pending }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-zinc-400">Expired</span>
-              <span class="text-lg font-bold text-zinc-600">{{ orderSummary.expired }}</span>
+              <span class="text-sm text-slate-500">Expired</span>
+              <span class="text-lg font-extrabold text-slate-400">{{ orderSummary.expired }}</span>
             </div>
           </div>
         </div>
 
-        <div class="bg-[#1a1a1a] rounded-2xl border border-zinc-800/40 shadow-xl p-6">
-          <h3 class="text-sm font-semibold text-zinc-200 mb-5">Paket & Enrollment</h3>
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+          <h3 class="text-sm font-bold text-slate-800 mb-5">Paket & Enrollment</h3>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <span class="text-sm text-zinc-400">Total Paket</span>
-              <span class="text-lg font-bold text-zinc-100">{{ totalPackages }}</span>
+              <span class="text-sm text-slate-500">Total Paket</span>
+              <span class="text-lg font-extrabold text-slate-800">{{ totalPackages }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-zinc-400">Enrollment Aktif</span>
-              <span class="text-lg font-bold text-[#cf3d3d]">{{ stats[3]?.value || 0 }}</span>
+              <span class="text-sm text-slate-500">Enrollment Aktif</span>
+              <span class="text-lg font-extrabold text-[#cf3d3d]">{{ stats[3]?.value || 0 }}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="bg-[#1a1a1a] rounded-2xl border border-zinc-800/40 shadow-xl overflow-hidden">
-        <div class="p-5 px-6 flex items-center justify-between border-b border-zinc-800/60">
-          <h3 class="text-sm font-semibold text-zinc-200">Pesanan Terbaru</h3>
+      <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="p-5 px-6 flex items-center justify-between border-b border-slate-100">
+          <h3 class="text-sm font-bold text-slate-800">Pesanan Terbaru</h3>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="text-xs font-semibold text-zinc-500 border-b border-zinc-800/50 bg-zinc-900/10">
+              <tr class="text-xs font-bold text-slate-400 border-b border-slate-100 bg-slate-50/50">
                 <th class="p-4 px-6">Order ID</th>
                 <th class="p-4 px-6">User</th>
                 <th class="p-4 px-6">Paket</th>
@@ -88,38 +88,38 @@
                 <th class="p-4 px-6">Waktu</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-zinc-800/50 text-sm">
-              <tr v-for="(order, idx) in recentOrders" :key="idx" class="hover:bg-zinc-800/20 transition-colors">
-                <td class="p-4 px-6 font-mono text-xs text-zinc-300">{{ order.order_number }}</td>
+            <tbody class="divide-y divide-slate-50 text-sm">
+              <tr v-for="(order, idx) in recentOrders" :key="idx" class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 px-6 font-mono text-xs text-slate-600">{{ order.order_number }}</td>
                 <td class="p-4 px-6">
-                  <div class="font-medium text-zinc-200">{{ order.user_name }}</div>
-                  <div class="text-xs text-zinc-500">{{ order.user_email }}</div>
+                  <div class="font-bold text-slate-800">{{ order.user_name }}</div>
+                  <div class="text-xs text-slate-400">{{ order.user_email }}</div>
                 </td>
-                <td class="p-4 px-6 text-zinc-300">{{ order.package_name }}</td>
-                <td class="p-4 px-6 font-medium text-zinc-200">Rp{{ formatNumber(order.amount) }}</td>
+                <td class="p-4 px-6 text-slate-700">{{ order.package_name }}</td>
+                <td class="p-4 px-6 font-bold text-slate-800">Rp{{ formatNumber(order.amount) }}</td>
                 <td class="p-4 px-6">
                   <span :class="statusBadge(order.status)">
                     {{ order.status }}
                   </span>
                 </td>
-                <td class="p-4 px-6 text-zinc-500 text-xs">{{ order.created_at }}</td>
+                <td class="p-4 px-6 text-slate-400 text-xs">{{ order.created_at }}</td>
               </tr>
               <tr v-if="recentOrders.length === 0">
-                <td colspan="6" class="p-8 text-center text-sm text-zinc-500">Belum ada pesanan.</td>
+                <td colspan="6" class="p-8 text-center text-sm text-slate-400">Belum ada pesanan.</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <div class="bg-[#1a1a1a] rounded-2xl border border-zinc-800/40 shadow-xl overflow-hidden">
-        <div class="p-5 px-6 flex items-center justify-between border-b border-zinc-800/60">
-          <h3 class="text-sm font-semibold text-zinc-200">User Terdaftar Terbaru</h3>
+      <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="p-5 px-6 flex items-center justify-between border-b border-slate-100">
+          <h3 class="text-sm font-bold text-slate-800">User Terdaftar Terbaru</h3>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="text-xs font-semibold text-zinc-500 border-b border-zinc-800/50 bg-zinc-900/10">
+              <tr class="text-xs font-bold text-slate-400 border-b border-slate-100 bg-slate-50/50">
                 <th class="p-4 px-6">Nama</th>
                 <th class="p-4 px-6">Email</th>
                 <th class="p-4 px-6">Role</th>
@@ -127,26 +127,26 @@
                 <th class="p-4 px-6">Bergabung</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-zinc-800/50 text-sm">
-              <tr v-for="(user, idx) in recentUsers" :key="idx" class="hover:bg-zinc-800/20 transition-colors">
+            <tbody class="divide-y divide-slate-50 text-sm">
+              <tr v-for="(user, idx) in recentUsers" :key="idx" class="hover:bg-slate-50 transition-colors">
                 <td class="p-4 px-6">
                   <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-[#cf3d3d]/10 border border-[#cf3d3d]/20 flex items-center justify-center text-xs font-bold text-[#cf3d3d]">
+                    <div class="w-8 h-8 rounded-lg bg-[#cf3d3d]/10 flex items-center justify-center text-xs font-bold text-[#cf3d3d]">
                       {{ user.name?.charAt(0).toUpperCase() }}
                     </div>
-                    <span class="font-medium text-zinc-200">{{ user.name }}</span>
+                    <span class="font-bold text-slate-800">{{ user.name }}</span>
                   </div>
                 </td>
-                <td class="p-4 px-6 text-zinc-400">{{ user.email }}</td>
+                <td class="p-4 px-6 text-slate-500">{{ user.email }}</td>
                 <td class="p-4 px-6">
                   <span :class="roleBadge(user.role)">{{ user.role }}</span>
                 </td>
                 <td class="p-4 px-6">
-                  <span :class="user.is_active ? 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500' : 'px-3 py-1 rounded-full text-xs font-bold bg-zinc-700 text-zinc-400'">
+                  <span :class="user.is_active ? 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700' : 'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500'">
                     {{ user.is_active ? 'Aktif' : 'Nonaktif' }}
                   </span>
                 </td>
-                <td class="p-4 px-6 text-zinc-500 text-xs">{{ user.created_at }}</td>
+                <td class="p-4 px-6 text-slate-400 text-xs">{{ user.created_at }}</td>
               </tr>
             </tbody>
           </table>
@@ -177,22 +177,22 @@ const formatNumber = (value) => {
 
 const statusBadge = (status) => {
   const map = {
-    paid: 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500',
-    pending: 'px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-500',
-    expired: 'px-3 py-1 rounded-full text-xs font-bold bg-zinc-700 text-zinc-400',
-    cancelled: 'px-3 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-500',
-    failed: 'px-3 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-500',
+    paid: 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700',
+    pending: 'px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700',
+    expired: 'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500',
+    cancelled: 'px-3 py-1 rounded-full text-xs font-bold bg-[#cf3d3d]/10 text-[#cf3d3d]',
+    failed: 'px-3 py-1 rounded-full text-xs font-bold bg-[#cf3d3d]/10 text-[#cf3d3d]',
   }
-  return map[status] || 'px-3 py-1 rounded-full text-xs font-bold bg-zinc-700 text-zinc-400'
+  return map[status] || 'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500'
 }
 
 const roleBadge = (role) => {
   const map = {
     admin: 'px-3 py-1 rounded-full text-xs font-bold bg-[#cf3d3d]/10 text-[#cf3d3d]',
-    teacher: 'px-3 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-500',
-    client: 'px-3 py-1 rounded-full text-xs font-bold bg-zinc-700 text-zinc-300',
+    teacher: 'px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700',
+    client: 'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600',
   }
-  return map[role] || 'px-3 py-1 rounded-full text-xs font-bold bg-zinc-700 text-zinc-400'
+  return map[role] || 'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500'
 }
 
 const fetchDashboard = async () => {
