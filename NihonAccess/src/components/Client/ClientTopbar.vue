@@ -1,6 +1,6 @@
 <template>
   <header class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-100 bg-white/80 px-6 backdrop-blur-md sm:px-8">
-    <!-- Left: title saja (toggle sudah pindah ke sidebar) -->
+    <!-- Left: title (toggle sudah pindah ke sidebar) -->
     <div class="flex items-center gap-3">
       <h2 class="text-base font-extrabold text-slate-800">{{ pageTitle }}</h2>
     </div>
@@ -16,10 +16,10 @@
 
       <div class="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white py-1.5 pl-1.5 pr-4 shadow-sm">
         <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#cf3d3d] to-[#b03333] text-sm font-extrabold text-white">
-          NA
+          {{ initials }}
         </div>
         <div class="hidden sm:block">
-          <p class="text-xs font-bold leading-tight text-slate-800">Nama User</p>
+          <p class="text-xs font-bold leading-tight text-slate-800">{{ userName }}</p>
           <p class="text-[10px] text-slate-400">Member</p>
         </div>
       </div>
@@ -33,4 +33,23 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const pageTitle = computed(() => route.meta.title || 'Dashboard')
+
+const userName = computed(() => {
+  try {
+    const data = JSON.parse(localStorage.getItem('user_data') || '{}')
+    return data.name || 'Member'
+  } catch {
+    return 'Member'
+  }
+})
+
+const initials = computed(() => {
+  const name = userName.value
+  return name
+    .split(' ')
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+})
 </script>

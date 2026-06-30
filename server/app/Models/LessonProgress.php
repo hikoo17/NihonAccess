@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -27,5 +28,14 @@ class LessonProgress extends Model
     public function lesson(): BelongsTo
     {
         return $this->belongsTo(Lesson::class);
+    }
+
+    /**
+     * Scope: hanya record yang lesson-nya sudah selesai.
+     * Dipakai di ClientDashboardController & EnrollmentResource.
+     */
+    public function scopeCompleted(Builder $query): Builder
+    {
+        return $query->where('is_completed', true);
     }
 }

@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\Teacher\TeacherLessonController;
 use App\Http\Controllers\Api\Teacher\TeacherListeningController;
 use App\Http\Controllers\Api\Teacher\TeacherQuizController;
 use App\Http\Controllers\Api\Teacher\TeacherWritingController;
+use App\Http\Controllers\Api\Client\ClientDashboardController; 
+use App\Http\Controllers\Api\Client\ClientCourseController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/packages', [PackageController::class, 'index']);
@@ -27,8 +29,8 @@ Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('admin')->middleware('admin')->group(function () {
+
         Route::get('dashboard', [AdminController::class, 'dashboard']);
-        Route::get('chart-data', [AdminController::class, 'chartData']);
 
         Route::get('users', [AdminController::class, 'users']);
         Route::patch('users/{user}', [AdminController::class, 'updateUser']);
@@ -57,4 +59,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::apiResource('writing-exercises', TeacherWritingController::class);
     });
+
+    Route::prefix('client')->group(function () {
+        Route::get('dashboard', [ClientDashboardController::class, 'index']);
+        Route::get('my-courses', [ClientCourseController::class, 'myCourses']);
+    });
 });
+

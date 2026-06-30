@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Client;
 
+use App\Http\Resources\EnrollmentResource;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
@@ -35,6 +36,24 @@ class ClientCourseController extends Controller
             'data' => new CourseResource($course->load(['lessons' => fn ($query) => $query->active()])),
         ]);
     }
+
+    public function myCourses(Request $request): JsonResponse
+{
+    $user = $request->user();
+
+    // Ambil SEMUA enrollment user (bukan hanya aktif),
+    // beserta relasi package-nya, urut dari terbaru.
+    $enrollments = $user->enrollments()
+        ->with('package')
+        ->latest('start_date')
+        ->get();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Daftar kursus saya berhasil diambil.',
+        'data' => EnrollmentResource::collection($enrollments),
+    ]);
+}
 
     private function paginationMeta($paginator): array
     {

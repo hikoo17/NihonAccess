@@ -18,8 +18,16 @@
       </p>
     </div>
 
+    <!-- Error banner -->
+    <div
+      v-if="error"
+      class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+    >
+      Gagal memuat data kursus: {{ error }}
+    </div>
+
     <!-- Filter tabs -->
-    <div class="flex items-center gap-2 overflow-x-auto">
+    <div v-if="!loading" class="flex items-center gap-2 overflow-x-auto">
       <button
         v-for="tab in tabs"
         :key="tab"
@@ -35,9 +43,25 @@
       </button>
     </div>
 
+    <!-- Loading skeleton -->
+    <div v-if="loading" class="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div
+        v-for="n in 4"
+        :key="n"
+        class="animate-pulse overflow-hidden rounded-2xl border border-slate-100 bg-white"
+      >
+        <div class="h-40 w-full bg-slate-200"></div>
+        <div class="space-y-3 p-5">
+          <div class="h-4 w-2/3 rounded bg-slate-200"></div>
+          <div class="h-3 w-1/3 rounded bg-slate-100"></div>
+          <div class="mt-4 h-2 w-full rounded bg-slate-100"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Grid -->
     <div
-      v-if="filteredCourses.length"
+      v-else-if="filteredCourses.length"
       class="grid grid-cols-1 gap-5 md:grid-cols-2"
     >
       <CourseCard
@@ -80,63 +104,63 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import Breadcrumb from "@/components/ui/Breadcrumb.vue";
 import Card from "@/components/ui/Card.vue";
 import Button from "@/components/ui/Button.vue";
 import CourseCard from "@/components/Client/CourseCard.vue";
+import { clientApi } from "@/services/clientApi";
 
 const tabs = ["Semua", "Aktif", "Selesai", "Kedaluwarsa"];
 const activeTab = ref("Semua");
 
-const courses = [
-  {
-    id: 1,
-    title: "JLPT N5 Fundamental",
-    level: "N5",
-    lesson: 12,
-    totalLessons: 20,
-    status: "active",
-    endDate: "15 Agu 2026",
-  },
-  {
-    id: 2,
-    title: "Kanji Dasar",
-    level: "N5",
-    lesson: 4,
-    totalLessons: 16,
-    status: "active",
-    endDate: "20 Sep 2026",
-  },
-  {
-    id: 3,
-    title: "Hiragana Mastery",
-    level: "N5",
-    lesson: 10,
-    totalLessons: 10,
-    status: "completed",
-    endDate: "10 Jun 2026",
-  },
-  {
-    id: 4,
-    title: "Grammar Pemula",
-    level: "N5",
-    lesson: 2,
-    totalLessons: 14,
-    status: "expired",
-    endDate: "01 Mei 2026",
-  },
-];
+const loading = ref(true);
+const error = ref(null);
+const courses = ref([]);
+
+// Format tanggal ISO (2026-08-15) → "15 Agu 2026"
+function formatDate(iso) {
+  if (!iso) return "TBA";
+  try {
+    return new Date(iso).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  } catch {
+    return "TBA";
+  }
+}
+
+onMounted(async () => {
+  try {
+    const res = await clientApi.myCourses();
+    // Mapping enrollment → bentuk yang dipakai CourseCard
+    courses.value = (res.data ?? []).map((e) => ({
+      id: e.id,
+      title: e.package?.name ?? "Tanpa Judul",
+      level: e.package?.level ?? "General",
+      lesson: e.progress?.current_lesson ?? 0,
+      totalLessons: e.progress?.total_lessons ?? 0,
+      status: e.effective_status ?? "active",
+      endDate: formatDate(e.end_date),
+    }));
+  } catch (err) {
+    error.value = err.message || "Terjadi kesalahan.";
+  } finally {
+    loading.value = false;
+  }
+});
 
 const filteredCourses = computed(() => {
-  if (activeTab.value === "Semua") return courses;
+  if (activeTab.value === "Semua") return courses.value;
   const map = { Aktif: "active", Selesai: "completed", Kedaluwarsa: "expired" };
-  return courses.filter((c) => c.status === map[activeTab.value]);
+  return courses.value.filter((c) => c.status === map[activeTab.value]);
 });
 
 const countByTab = (tab) => {
-  if (tab === "Semua") return courses.length;
+  if (tab === "Semua") return courses.value.length;
   const map = { Aktif: "active", Selesai: "completed", Kedaluwarsa: "expired" };
-  return courses.filter((c) => c.status === map[tab]).length;
+  return courses.value.filter((c) => c.status === map[tab]).length;
 };
 </script>
