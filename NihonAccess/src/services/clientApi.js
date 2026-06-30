@@ -45,6 +45,8 @@ async function request(path, { method = 'GET', body, query } = {}) {
 export const clientApi = {
   dashboard: () => request('/dashboard'),
   myCourses: () => request('/my-courses'),
+  courseLessons: (enrollmentId) => request(`/my-courses/${enrollmentId}/lessons`),
+  completeLesson: (lessonId) => request(`/lessons/${lessonId}/complete`, { method: 'POST' }),
 
   // Endpoint lain bisa ditambahkan di sini nanti, contoh:
   // courses: {
