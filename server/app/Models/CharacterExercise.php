@@ -15,12 +15,14 @@ class CharacterExercise extends Model
         'character_type',
         'character',
         'answer',
+        'options',
         'hint',
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'options' => 'array',
     ];
 
     public function course(): BelongsTo
@@ -41,5 +43,10 @@ class CharacterExercise extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeType(Builder $query, string $type): Builder
+    {
+        return $query->where('character_type', $type);
     }
 }

@@ -44,6 +44,9 @@
           <template #cell-course="{ row }">
             <span class="font-medium text-slate-600">{{ row.course?.title || '-' }}</span>
           </template>
+          <template #cell-options="{ row }">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">{{ (row.options || []).length }} opsi</span>
+          </template>
           <template #cell-is_active="{ row }"><TeacherStatusBadge :active="row.is_active" /></template>
           <template #cell-actions="{ row }">
             <div class="flex items-center justify-end gap-1.5">
@@ -97,6 +100,7 @@ const columns = [
   { key: 'character', label: 'Karakter' },
   { key: 'character_type', label: 'Tipe' },
   { key: 'course', label: 'Course' },
+  { key: 'options', label: 'Opsi', align: 'center' },
   { key: 'is_active', label: 'Status' },
   { key: 'actions', label: 'Aksi', align: 'right' },
 ]

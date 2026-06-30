@@ -15,6 +15,8 @@ class CourseResource extends JsonResource
             'title'         => $this->title,
             'slug'          => $this->slug,
             'description'   => $this->description,
+            'thumbnail'     => $this->thumbnail,
+            'thumbnail_url' => $this->thumbnail_url,
             'level'         => $this->level,
             'is_active'     => $this->is_active,
             'lessons_count' => $this->whenCounted('lessons'),

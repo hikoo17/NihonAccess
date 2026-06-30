@@ -59,7 +59,7 @@
           <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <label class="mb-1.5 block text-sm font-bold text-slate-700">Jawaban <span class="text-[#cf3d3d]">*</span></label>
-              <input v-model="form.answer" type="text" placeholder="cth. a" :class="inputClass(errors.answer)" />
+              <input v-model="form.answer" type="text" placeholder="cth. a" :class="inputClass(errors.answer)" @input="syncAnswerToOptions" />
               <p v-if="errors.answer" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors.answer[0] }}</p>
             </div>
             <div>
@@ -67,6 +67,24 @@
               <input v-model="form.hint" type="text" placeholder="Petunjuk jawaban" :class="inputClass(errors.hint)" />
               <p v-if="errors.hint" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors.hint[0] }}</p>
             </div>
+          </div>
+
+          <div>
+            <div class="mb-1.5 flex items-center justify-between">
+              <label class="block text-sm font-bold text-slate-700">Opsi Jawaban <span class="text-[#cf3d3d]">*</span></label>
+              <button type="button" @click="fillAnswerAsOption" class="text-xs font-bold text-[#cf3d3d] hover:underline">Isi jawaban ke opsi 1</button>
+            </div>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div v-for="(_, i) in form.options" :key="i">
+                <div class="flex items-center gap-2">
+                  <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-bold text-slate-500">{{ String.fromCharCode(65 + i) }}</span>
+                  <input v-model="form.options[i]" type="text" :placeholder="`Opsi ${String.fromCharCode(65 + i)}`" :class="inputClass(optionsErrors[i])" />
+                </div>
+                <p v-if="optionsErrors[i]" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ optionsErrors[i] }}</p>
+              </div>
+            </div>
+            <p v-if="optionsValidationError" class="mt-1.5 text-xs font-semibold text-[#cf3d3d]">{{ optionsValidationError }}</p>
+            <p class="mt-1.5 text-xs font-medium text-slate-400">Isi 4 opsi. Salah satu opsi harus sama persis dengan jawaban benar. Untuk hiragana/katakana cukup tulis romaji.</p>
           </div>
 
           <label class="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-3">
@@ -101,6 +119,8 @@ const loading = ref(true)
 const submitting = ref(false)
 const lessons = ref([])
 const errors = ref({})
+const optionsValidationError = ref('')
+const optionsErrors = ref([])
 
 const form = reactive({
   course_id: '',
@@ -108,6 +128,7 @@ const form = reactive({
   character_type: '',
   character: '',
   answer: '',
+  options: ['', '', '', ''],
   hint: '',
   is_active: true,
 })
@@ -124,17 +145,56 @@ const loadLessons = async (cid) => {
 
 watch(() => form.course_id, (cid) => loadLessons(cid))
 
+const fillAnswerAsOption = () => {
+  if (form.answer) form.options[0] = form.answer
+}
+
+const syncAnswerToOptions = () => {
+  // kosongkan error opsi saat jawaban berubah
+  optionsValidationError.value = ''
+}
+
+const validateOptions = () => {
+  optionsErrors.value = []
+  optionsValidationError.value = ''
+  let valid = true
+
+  const filled = form.options.map((o) => (o || '').trim())
+  const emptyIdx = filled.findIndex((o) => o === '')
+  if (emptyIdx !== -1) {
+    optionsErrors.value = form.options.map(() => '')
+    optionsErrors.value[emptyIdx] = 'Opsi tidak boleh kosong.'
+    valid = false
+  }
+
+  const lower = filled.map((o) => o.toLowerCase())
+  if (new Set(lower).size !== lower.length) {
+    optionsValidationError.value = 'Ada opsi yang duplikat. Pastikan 4 opsi berbeda.'
+    valid = false
+  }
+
+  const answerLower = (form.answer || '').trim().toLowerCase()
+  if (answerLower && !lower.includes(answerLower)) {
+    optionsValidationError.value = 'Jawaban benar harus sama dengan salah satu opsi.'
+    valid = false
+  }
+
+  return valid
+}
+
 const buildPayload = () => ({
   course_id: Number(form.course_id),
   lesson_id: form.lesson_id ? Number(form.lesson_id) : null,
   character_type: form.character_type,
   character: form.character,
   answer: form.answer,
+  options: form.options.map((o) => o.trim()),
   hint: form.hint || null,
   is_active: !!form.is_active,
 })
 
 const submit = async () => {
+  if (!validateOptions()) return
   submitting.value = true
   errors.value = {}
   try {
@@ -165,6 +225,9 @@ onMounted(async () => {
       form.character_type = d.character_type
       form.character = d.character
       form.answer = d.answer
+      form.options = Array.isArray(d.options) && d.options.length === 4
+        ? [...d.options]
+        : [d.answer, '', '', '']
       form.hint = d.hint || ''
       form.is_active = d.is_active ?? true
       await loadLessons(d.course_id)

@@ -16,6 +16,7 @@ class CharacterExerciseResource extends JsonResource
             'character_type' => $this->character_type,
             'character'      => $this->character,
             'answer'         => $this->answer,
+            'options'        => $this->options,
             'hint'           => $this->hint,
             'is_active'      => $this->is_active,
             'created_at'     => $this->created_at,

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
 
 class Course extends Model
 {
@@ -15,6 +17,7 @@ class Course extends Model
         'title',
         'slug',
         'description',
+        'thumbnail',
         'level',
         'is_active',
     ];
@@ -22,6 +25,13 @@ class Course extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    protected function thumbnailUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->thumbnail ? Storage::disk('public')->url($this->thumbnail) : null,
+        );
+    }
 
     public function teacher(): BelongsTo
     {

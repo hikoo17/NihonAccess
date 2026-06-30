@@ -17,6 +17,8 @@ class TeacherCharacterController extends Controller
         $exercises = CharacterExercise::query()
             ->whereHas('course', fn ($q) => $q->where('teacher_id', $request->user()->id))
             ->with(['course', 'lesson'])
+            ->when($request->filled('course_id'), fn ($q) => $q->where('course_id', $request->integer('course_id')))
+            ->when($request->filled('lesson_id'), fn ($q) => $q->where('lesson_id', $request->integer('lesson_id')))
             ->when($request->filled('character_type'), fn ($q) => $q->where('character_type', $request->input('character_type')))
             ->latest()
             ->paginate($request->integer('per_page', 15));
@@ -43,9 +45,13 @@ class TeacherCharacterController extends Controller
             'character_type' => ['required', 'in:hiragana,katakana,kanji'],
             'character'      => ['required', 'string', 'max:255'],
             'answer'         => ['required', 'string', 'max:255'],
+            'options'        => ['required', 'array', 'size:4'],
+            'options.*'      => ['required', 'string', 'max:255'],
             'hint'           => ['nullable', 'string', 'max:255'],
             'is_active'      => ['nullable', 'boolean'],
         ]);
+
+        $this->ensureAnswerInOptions($validated);
 
         Course::query()->where('teacher_id', $request->user()->id)->findOrFail($validated['course_id']);
 
@@ -68,9 +74,13 @@ class TeacherCharacterController extends Controller
             'character_type' => ['sometimes', 'in:hiragana,katakana,kanji'],
             'character'      => ['sometimes', 'string', 'max:255'],
             'answer'         => ['sometimes', 'string', 'max:255'],
+            'options'        => ['sometimes', 'array', 'size:4'],
+            'options.*'      => ['sometimes', 'string', 'max:255'],
             'hint'           => ['nullable', 'string', 'max:255'],
             'is_active'      => ['nullable', 'boolean'],
         ]);
+
+        $this->ensureAnswerInOptions($validated, $characterExercise);
 
         if (isset($validated['course_id'])) {
             Course::query()->where('teacher_id', $request->user()->id)->findOrFail($validated['course_id']);
@@ -105,5 +115,28 @@ class TeacherCharacterController extends Controller
             403,
             'Akses ditolak.'
         );
+    }
+
+    /**
+     * Pastikan jawaban benar termasuk salah satu opsi.
+     * Saat update, jika answer/options tidak dikirim, fallback ke nilai model.
+     */
+    private function ensureAnswerInOptions(array &$validated, ?CharacterExercise $existing = null): void
+    {
+        $answer = $validated['answer'] ?? $existing?->answer;
+        $options = $validated['options'] ?? $existing?->options;
+
+        if ($answer !== null && is_array($options)) {
+            $inOptions = collect($options)
+                ->contains(fn ($opt) => strcasecmp(trim((string) $opt), trim((string) $answer)) === 0);
+
+            if (! $inOptions) {
+                abort(response()->json([
+                    'success' => false,
+                    'message' => 'Jawaban benar harus termasuk salah satu opsi.',
+                    'errors' => ['answer' => ['Jawaban benar harus sama dengan salah satu opsi yang dimasukkan.']],
+                ], 422));
+            }
+        }
     }
 }

@@ -56,4 +56,9 @@ export const clientApi = {
   // progress: {
   //   complete: (lessonId) => request('/progress', { method: 'POST', body: { lesson_id: lessonId } }),
   // },
+    characters: {
+    list: (query) => request('/character-exercises', { query }),
+    get: (id) => request(`/character-exercises/${id}`),
+    submit: (body) => request('/character-exercises/submit', { method: 'POST', body }),
+  },
 }

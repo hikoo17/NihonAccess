@@ -1,7 +1,7 @@
 const BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 const token = () => localStorage.getItem('auth_token')
 
-async function request(path, { method = 'GET', body, query } = {}) {
+async function request(path, { method = 'GET', body, query, form } = {}) {
   const url = new URL(`${BASE}/api/teacher${path}`)
   if (query) {
     for (const [k, v] of Object.entries(query)) {
@@ -9,14 +9,23 @@ async function request(path, { method = 'GET', body, query } = {}) {
     }
   }
 
+  let finalBody
+  let headers = {
+    'Accept': 'application/json',
+    'Authorization': `Bearer ${token()}`,
+  }
+  if (form) {
+    finalBody = form
+    // jangan set Content-Type, browser otomatis tambah boundary multipart/form-data
+  } else if (body) {
+    headers['Content-Type'] = 'application/json'
+    finalBody = JSON.stringify(body)
+  }
+
   const res = await fetch(url, {
     method,
-headers: {
-      'Accept': 'application/json', // <--- TAMBAHKAN INI AGAR JIKA ERROR, BACKEND BALIKIN JSON (BUKAN REDIRECT 302)
-      'Authorization': `Bearer ${token()}`,
-      ...(body ? { 'Content-Type': 'application/json' } : {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
+    headers,
+    body: finalBody,
   })
 
 
@@ -49,6 +58,9 @@ export const teacherApi = {
   courses: {
     list: (query) => request('/courses', { query }),
     get: (id) => request(`/courses/${id}`),
+    create: (form) => request('/courses', { method: 'POST', form }),
+    update: (id, form) => request(`/courses/${id}`, { method: 'POST', form }),
+    remove: (id) => request(`/courses/${id}`, { method: 'DELETE' }),
   },
 
   lessons: {
