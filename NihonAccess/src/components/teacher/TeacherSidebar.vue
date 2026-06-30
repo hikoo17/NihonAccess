@@ -89,7 +89,7 @@ const menuItems = [
   { label: 'Dashboard', routeName: 'TeacherDashboard', icon: iconDashboard },
   { label: 'Course & Lesson', routeName: 'TeacherCourses', icon: iconCourse },
   { label: 'Quiz & Soal', routeName: 'TeacherQuiz', icon: iconQuiz },
-  { label: 'Tebak Huruf', routeName: 'TeacherCharacters', icon: iconCharacter },
+  // { label: 'Tebak Huruf', routeName: 'TeacherCharacters', icon: iconCharacter },
   { label: 'Listening', routeName: 'TeacherListening', icon: iconListening },
 ]
 
