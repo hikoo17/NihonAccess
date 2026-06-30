@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm sm:p-6">
+  <Card class="p-5 sm:p-6">
     <div class="flex items-start justify-between gap-4">
       <div class="min-w-0">
         <p class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ label }}</p>
@@ -10,10 +10,12 @@
         <slot name="icon" />
       </div>
     </div>
-  </div>
+  </Card>
 </template>
 
 <script setup>
+import Card from '@/components/ui/Card.vue'
+
 defineProps({
   label: { type: String, required: true },
   value: { type: [String, Number], required: true },

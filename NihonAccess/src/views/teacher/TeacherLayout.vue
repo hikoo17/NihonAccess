@@ -1,12 +1,28 @@
 <template>
-  <div class="flex min-h-screen bg-slate-50/50 font-sans text-slate-900 antialiased">
-    <TeacherSidebar />
+  <div class="min-h-screen bg-slate-50/50 font-sans text-slate-900 antialiased">
+    <!-- Sidebar -->
+    <TeacherSidebar :is-collapsed="isCollapsed" @toggle="toggleSidebar" @navigate="onNavigate" />
 
-    <div class="flex min-w-0 flex-1 flex-col">
-      <TeacherTopbar :title="currentRouteTitle" />
+    <!-- Backdrop (mobile only, saat melebar) -->
+    <div
+      v-if="!isCollapsed"
+      class="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-sm lg:hidden"
+      @click="isCollapsed = true"
+    />
 
-      <main class="flex-1 overflow-y-auto px-6 py-8">
-        <router-view />
+    <!-- Konten utama: padding kiri dinamis -->
+    <div
+      class="transition-all duration-300 ease-in-out pl-20"
+      :class="isCollapsed ? 'lg:pl-20' : 'lg:pl-64'"
+    >
+      <TeacherTopbar />
+
+      <main class="px-6 py-8 sm:px-8 lg:px-10">
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
       </main>
     </div>
 
@@ -15,16 +31,51 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, onUnmounted } from 'vue'
 import TeacherSidebar from '@/components/teacher/TeacherSidebar.vue'
 import TeacherTopbar from '@/components/teacher/TeacherTopbar.vue'
 import TeacherToast from '@/components/teacher/TeacherToast.vue'
 
-const route = useRoute()
+const DESKTOP_BREAKPOINT = 1024
 
-const currentRouteTitle = computed(() => {
-  const raw = route.meta.titlePrefix || route.meta.title || 'Panel Guru'
-  return raw.replace(/\s*\|\s*Teacher.*$/i, '')
+// isCollapsed: true = menyempit (logo+ikon), false = melebar (full)
+const isCollapsed = ref(false)
+
+const toggleSidebar = () => {
+  isCollapsed.value = !isCollapsed.value
+}
+
+// Klik menu di mobile → otomatis menyempit balik
+const onNavigate = () => {
+  if (typeof window !== 'undefined' && window.innerWidth < DESKTOP_BREAKPOINT) {
+    isCollapsed.value = true
+  }
+}
+
+const handleResize = () => {
+  if (window.innerWidth < DESKTOP_BREAKPOINT) {
+    isCollapsed.value = true
+  }
+}
+
+onMounted(() => {
+  // Default: melebar di desktop, menyempit di mobile
+  isCollapsed.value = window.innerWidth < DESKTOP_BREAKPOINT
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
 })
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

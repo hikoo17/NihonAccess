@@ -1,11 +1,9 @@
 <template>
   <div class="animate-fadeIn space-y-8">
     <div>
-      <span class="inline-flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.22em] text-[#cf3d3d]">
-        <span class="h-px w-8 bg-[#cf3d3d]"></span>Dashboard
-      </span>
-      <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">Selamat datang, {{ firstName }} 👋</h1>
-      <p class="mt-1 text-sm font-medium text-slate-500">Ringkasan aktivitas mengajar Anda hari ini.</p>
+      <Breadcrumb :items="[{ label: 'Beranda', to: '/' }, { label: 'Dashboard' }]" />
+      <h1 class="mt-3 text-2xl font-extrabold tracking-tight text-slate-800 sm:text-3xl">Selamat datang, <span class="text-[#cf3d3d]">{{ firstName }}</span> <span class="wave-emoji">👋</span></h1>
+      <p class="mt-1 text-sm text-slate-500">Ringkasan aktivitas mengajar Anda hari ini.</p>
     </div>
 
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -85,6 +83,7 @@
 import { ref, computed, h, onMounted } from 'vue'
 import { teacherApi } from '@/services/teacherApi'
 import { useTeacherToast } from '@/composables/useTeacherToast'
+import Breadcrumb from '@/components/ui/Breadcrumb.vue'
 import TeacherStatCard from '@/components/teacher/TeacherStatCard.vue'
 import TeacherStatusBadge from '@/components/teacher/ui/TeacherStatusBadge.vue'
 
@@ -148,4 +147,15 @@ onMounted(fetchDashboard)
 <style scoped>
 .animate-fadeIn { animation: fadeIn 0.35s ease-out forwards; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.wave-emoji { display: inline-block; animation: wave-animation 2.5s infinite; transform-origin: 70% 70%; }
+@keyframes wave-animation {
+  0% { transform: rotate(0.0deg) }
+  10% { transform: rotate(14.0deg) }
+  20% { transform: rotate(-8.0deg) }
+  30% { transform: rotate(14.0deg) }
+  40% { transform: rotate(-4.0deg) }
+  50% { transform: rotate(10.0deg) }
+  60% { transform: rotate(0.0deg) }
+  100% { transform: rotate(0.0deg) }
+}
 </style>
