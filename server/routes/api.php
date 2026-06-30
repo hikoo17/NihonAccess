@@ -31,7 +31,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('admin')->middleware('admin')->group(function () {
 
         Route::get('dashboard', [AdminController::class, 'dashboard']);
-        Route::get('chart-data', [AdminController::class, 'chartData']);
 
         Route::get('users', [AdminController::class, 'users']);
         Route::patch('users/{user}', [AdminController::class, 'updateUser']);
@@ -64,6 +63,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('client')->group(function () {
         Route::get('dashboard', [ClientDashboardController::class, 'index']);
         Route::get('my-courses', [ClientCourseController::class, 'myCourses']);
+        Route::get('my-courses/{enrollment}/lessons', [ClientCourseController::class, 'lessons']);
+        Route::post('lessons/{lesson}/complete', [ClientCourseController::class, 'completeLesson']);
     });
 });
 
