@@ -5,7 +5,7 @@
       <Breadcrumb
         :items="[
           { label: 'Kursus Saya', to: '/client/my-courses' },
-          { label: 'JLPT N5 Fundamental' },
+          { label: loading ? 'Memuat...' : courseTitle },
         ]"
       />
       <RouterLink
@@ -16,76 +16,109 @@
       </RouterLink>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <!-- Error banner -->
+    <div
+      v-if="error"
+      class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+    >
+      Gagal memuat pelajaran: {{ error }}
+    </div>
+
+    <!-- Loading -->
+    <div v-else-if="loading" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div class="space-y-6 lg:col-span-2">
+        <div class="aspect-video animate-pulse rounded-2xl bg-slate-200"></div>
+        <div class="space-y-3 rounded-2xl border border-slate-100 bg-white p-6">
+          <div class="h-4 w-1/3 rounded bg-slate-200"></div>
+          <div class="h-5 w-2/3 rounded bg-slate-200"></div>
+          <div class="mt-3 h-2 w-full rounded bg-slate-100"></div>
+          <div class="h-2 w-full rounded bg-slate-100"></div>
+        </div>
+      </div>
+      <div class="h-64 animate-pulse rounded-2xl bg-slate-200"></div>
+    </div>
+
+    <!-- Content -->
+    <div v-else-if="currentLesson" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <!-- Left: lesson content -->
       <div class="space-y-6 lg:col-span-2">
         <!-- Video player -->
         <Card class="overflow-hidden">
-          <div
-            class="flex aspect-video items-center justify-center bg-slate-900"
-          >
-            <button
-              class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur transition hover:scale-110 hover:bg-white/30"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                class="h-8 w-8 text-white"
+          <div class="flex aspect-video items-center justify-center bg-slate-900">
+            <!-- Video asli kalau ada -->
+            <video
+              v-if="currentLesson.video_url"
+              :key="currentLesson.id"
+              class="h-full w-full"
+              controls
+              :src="currentLesson.video_url"
+            ></video>
+            <!-- Placeholder kalau tidak ada video -->
+            <div v-else class="text-center">
+              <div
+                class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur"
               >
-                <path
-                  fill-rule="evenodd"
-                  d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="h-8 w-8 text-white"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <p class="mt-3 text-xs font-medium text-white/60">
+                Video belum tersedia
+              </p>
+            </div>
           </div>
         </Card>
 
         <!-- Lesson info -->
         <Card class="p-6">
           <div class="mb-4 flex items-center gap-2">
-            <Badge variant="info" size="sm">Lesson 3 dari 20</Badge>
-            <Badge variant="neutral" size="sm">⏱ 12 menit</Badge>
+            <Badge variant="info" size="sm"
+              >Lesson {{ currentIndex + 1 }} dari {{ lessons.length }}</Badge
+            >
+            <Badge variant="neutral" size="sm">⏱ Pelajaran</Badge>
           </div>
           <h1 class="text-xl font-extrabold tracking-tight text-slate-800">
             {{ currentLesson.title }}
           </h1>
-          <p class="mt-2 text-sm leading-relaxed text-slate-500">
-            Dalam pelajaran ini kamu akan mempelajari huruf hiragana dasar, cara
-            membaca dan menulisnya dengan benar. Perhatikan stroke order agar
-            tulisan kamu rapi dan sesuai standar.
-          </p>
 
           <!-- Content -->
-          <div class="mt-5 space-y-3 rounded-2xl bg-slate-50 p-5">
-            <h3 class="text-sm font-extrabold text-slate-700">
-              Ringkasan Materi
-            </h3>
-            <ul class="space-y-2 text-xs text-slate-600">
-              <li class="flex items-start gap-2">
-                <span class="font-jp mt-1 h-1.5 w-1.5 rounded-full bg-[#cf3d3d]"></span>
-                Pengenalan 46 huruf hiragana dasar (あ 〜 ん)
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="mt-1 h-1.5 w-1.5 rounded-full bg-[#cf3d3d]"></span>
-                Teknik menulis dengan stroke order yang benar
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="mt-1 h-1.5 w-1.5 rounded-full bg-[#cf3d3d]"></span>
-                Kosakata sederhana menggunakan hiragana
-              </li>
-            </ul>
-          </div>
+          <p
+            v-if="currentLesson.content"
+            class="mt-3 whitespace-pre-line text-sm leading-relaxed text-slate-500"
+          >
+            {{ currentLesson.content }}
+          </p>
+          <p v-else class="mt-3 text-sm italic text-slate-400">
+            Konten pelajaran belum tersedia.
+          </p>
         </Card>
 
         <!-- Navigation -->
         <div class="flex items-center justify-between">
-          <Button variant="outline" size="sm">← Sebelumnya</Button>
-          <Button size="sm" @click="completeLesson"
-            >Tandai Selesai & Lanjut →</Button
+          <Button
+            variant="outline"
+            size="sm"
+            :disabled="currentIndex === 0"
+            @click="goTo(currentIndex - 1)"
           >
+            ← Sebelumnya
+          </Button>
+          <Button
+            size="sm"
+            :disabled="completing"
+            @click="completeLesson"
+          >
+            {{ completing ? "Menyimpan..." : "Tandai Selesai & Lanjut →" }}
+          </Button>
         </div>
       </div>
 
@@ -93,77 +126,97 @@
       <div class="lg:col-span-1">
         <div class="sticky top-24">
           <LessonSidebar
-            course-title="JLPT N5 Fundamental"
-            :lessons="lessons"
+            :course-title="courseTitle"
+            :lessons="sidebarLessons"
             :current-id="currentLesson.id"
-            @select="selectLesson"
+            @select="onSelectLesson"
           />
         </div>
       </div>
     </div>
+
+    <!-- Empty -->
+    <Card v-else class="p-12 text-center">
+      <h3 class="text-sm font-extrabold text-slate-800">Belum ada pelajaran</h3>
+      <p class="mx-auto mt-1 max-w-xs text-xs text-slate-400">
+        Kursus ini belum memiliki pelajaran yang dapat diakses.
+      </p>
+    </Card>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted } from "vue";
 import Breadcrumb from "@/components/ui/Breadcrumb.vue";
 import Card from "@/components/ui/Card.vue";
 import Button from "@/components/ui/Button.vue";
 import Badge from "@/components/ui/Badge.vue";
 import LessonSidebar from "@/components/Client/LessonSidebar.vue";
+import { clientApi } from "@/services/clientApi";
 
 const props = defineProps({
   id: { type: [String, Number], default: "" },
 });
 
-const lessons = ref([
-  {
-    id: 1,
-    title: "Pengenalan Hiragana",
-    duration: "10 menit",
-    completed: true,
-  },
-  { id: 2, title: "Hiragana: あ 〜 さ", duration: "12 menit", completed: true },
-  {
-    id: 3,
-    title: "Hiragana: た 〜 や",
-    duration: "12 menit",
-    completed: false,
-  },
-  {
-    id: 4,
-    title: "Hiragana: ら 〜 ん",
-    duration: "10 menit",
-    completed: false,
-  },
-  {
-    id: 5,
-    title: "Dakuten & Handakuten",
-    duration: "15 menit",
-    completed: false,
-  },
-  {
-    id: 6,
-    title: "Kombinasi Hiragana",
-    duration: "14 menit",
-    completed: false,
-  },
-  { id: 7, title: "Latihan Menulis", duration: "20 menit", completed: false },
-]);
+const loading = ref(true);
+const error = ref(null);
+const completing = ref(false);
 
-const currentLesson = ref(lessons.value[2]);
+const courseTitle = ref("");
+const lessons = ref([]);
+const currentIndex = ref(0);
 
-const selectLesson = (lesson) => {
-  currentLesson.value = lesson;
-};
+const currentLesson = computed(() => lessons.value[currentIndex.value] ?? null);
 
-const completeLesson = () => {
-  const idx = lessons.value.findIndex((l) => l.id === currentLesson.value.id);
-  if (idx !== -1) {
-    lessons.value[idx].completed = true;
-    if (idx + 1 < lessons.value.length) {
-      currentLesson.value = lessons.value[idx + 1];
-    }
+// Mapping ke bentuk yang dibutuhkan LessonSidebar
+const sidebarLessons = computed(() =>
+  lessons.value.map((l) => ({
+    id: l.id,
+    title: l.title,
+    duration: "Pelajaran", // DB tidak punya kolom duration → pakai placeholder
+    completed: l.completed,
+  }))
+);
+
+onMounted(async () => {
+  try {
+    const res = await clientApi.courseLessons(props.id);
+    const data = res.data ?? {};
+    courseTitle.value = data.title ?? "Kursus";
+    lessons.value = data.lessons ?? [];
+  } catch (err) {
+    error.value = err.message || "Terjadi kesalahan.";
+  } finally {
+    loading.value = false;
   }
-};
+});
+
+function onSelectLesson(lesson) {
+  const idx = lessons.value.findIndex((l) => l.id === lesson.id);
+  if (idx !== -1) currentIndex.value = idx;
+}
+
+function goTo(idx) {
+  if (idx >= 0 && idx < lessons.value.length) {
+    currentIndex.value = idx;
+  }
+}
+
+async function completeLesson() {
+  if (!currentLesson.value || completing.value) return;
+  completing.value = true;
+  try {
+    await clientApi.completeLesson(currentLesson.value.id);
+    // tandai selesai secara lokal
+    lessons.value[currentIndex.value].completed = true;
+    // lanjut ke pelajaran berikutnya
+    if (currentIndex.value + 1 < lessons.value.length) {
+      currentIndex.value += 1;
+    }
+  } catch (err) {
+    error.value = err.message || "Gagal menandai pelajaran.";
+  } finally {
+    completing.value = false;
+  }
+}
 </script>

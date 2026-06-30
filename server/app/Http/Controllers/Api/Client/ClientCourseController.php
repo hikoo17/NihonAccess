@@ -8,6 +8,9 @@ use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\Enrollment;
+use App\Models\Lesson;
+use App\Models\LessonProgress;
 
 class ClientCourseController extends Controller
 {
@@ -52,6 +55,84 @@ class ClientCourseController extends Controller
         'success' => true,
         'message' => 'Daftar kursus saya berhasil diambil.',
         'data' => EnrollmentResource::collection($enrollments),
+    ]);
+}
+
+/**
+ * Ambil daftar lesson dari sebuah enrollment (halaman belajar).
+ */
+public function lessons(Request $request, Enrollment $enrollment): JsonResponse
+{
+    $user = $request->user();
+
+    // Pastikan enrollment milik user yang login
+    if ($enrollment->user_id !== $user->id) {
+        abort(403, 'Kursus ini bukan milik Anda.');
+    }
+
+    $enrollment->load('package');
+
+    // Semua lesson aktif dari course yang ter-link ke package enrollment
+    $lessons = Lesson::active()
+        ->whereHas('course.packages', fn ($q) => $q->where('packages.id', $enrollment->package_id))
+        ->orderBy('sort_order')
+        ->orderBy('id')
+        ->get();
+
+    // Ambil daftar lesson yang sudah diselesaikan user
+    $completedIds = LessonProgress::where('user_id', $user->id)
+        ->where('is_completed', true)
+        ->whereIn('lesson_id', $lessons->pluck('id'))
+        ->pluck('lesson_id');
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Daftar pelajaran berhasil diambil.',
+        'data' => [
+            'title'   => $enrollment->package?->name ?? 'Kursus',
+            'lessons' => $lessons->map(fn ($lesson) => [
+                'id'         => $lesson->id,
+                'title'      => $lesson->title,
+                'slug'       => $lesson->slug,
+                'content'    => $lesson->content,
+                'video_url'  => $lesson->video_url,
+                'sort_order' => $lesson->sort_order,
+                'completed'  => $completedIds->contains($lesson->id),
+            ]),
+        ],
+    ]);
+}
+
+/**
+ * Tandai sebuah lesson sebagai selesai.
+ */
+public function completeLesson(Request $request, Lesson $lesson): JsonResponse
+{
+    $user = $request->user();
+
+    // Pastikan lesson ini bisa diakses user (ada di course milik package yang ia enroll)
+    $accessible = Lesson::active()
+        ->where('id', $lesson->id)
+        ->whereHas('course.packages', fn ($q) =>
+            $q->whereIn('packages.id', $user->enrollments()->pluck('package_id')))
+        ->exists();
+
+    if (! $accessible) {
+        abort(403, 'Pelajaran ini tidak dapat diakses.');
+    }
+
+    LessonProgress::updateOrCreate(
+        ['user_id' => $user->id, 'lesson_id' => $lesson->id],
+        ['is_completed' => true, 'completed_at' => now()],
+    );
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Pelajaran ditandai selesai.',
+        'data' => [
+            'id'        => $lesson->id,
+            'completed' => true,
+        ],
     ]);
 }
 
