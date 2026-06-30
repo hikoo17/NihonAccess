@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('profile', [AdminController::class, 'profile']);
         Route::put('profile', [AdminController::class, 'updateProfile']);
+        Route::get('chart-data', [AdminController::class, 'chartData']);
     });
 
     Route::prefix('teacher')->group(function () {
