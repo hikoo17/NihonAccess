@@ -1,3 +1,4 @@
+
 <?php
 
 use App\Http\Controllers\Api\AdminController;
@@ -11,8 +12,9 @@ use App\Http\Controllers\Api\Teacher\TeacherLessonController;
 use App\Http\Controllers\Api\Teacher\TeacherListeningController;
 use App\Http\Controllers\Api\Teacher\TeacherQuizController;
 use App\Http\Controllers\Api\Teacher\TeacherWritingController;
-use App\Http\Controllers\Api\Client\ClientDashboardController; 
+use App\Http\Controllers\Api\Client\ClientCharacterController;
 use App\Http\Controllers\Api\Client\ClientCourseController;
+use App\Http\Controllers\Api\Client\ClientDashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/packages', [PackageController::class, 'index']);
@@ -47,7 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('teacher')->group(function () {
         Route::get('dashboard', [TeacherDashboardController::class, 'index']);
 
-        Route::apiResource('courses', TeacherCourseController::class)->only(['index', 'show']);
+        Route::apiResource('courses', TeacherCourseController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
         Route::apiResource('lessons', TeacherLessonController::class)->only(['store', 'show', 'update', 'destroy']);
 
@@ -65,6 +67,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('my-courses', [ClientCourseController::class, 'myCourses']);
         Route::get('my-courses/{enrollment}/lessons', [ClientCourseController::class, 'lessons']);
         Route::post('lessons/{lesson}/complete', [ClientCourseController::class, 'completeLesson']);
+        // Tebak Huruf (character exercises) untuk siswa
+        Route::get('character-exercises', [ClientCharacterController::class, 'index']);
+        Route::get('character-exercises/{characterExercise}', [ClientCharacterController::class, 'show']);
+        Route::post('character-exercises/submit', [ClientCharacterController::class, 'submit']);
     });
 });
+
 
