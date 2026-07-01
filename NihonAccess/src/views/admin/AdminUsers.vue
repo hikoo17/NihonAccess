@@ -20,20 +20,26 @@
       <div class="relative max-w-xs flex-1">
         <Input v-model="search" placeholder="Cari nama, email, atau username..." @input="onSearchInput" />
       </div>
-      <div class="flex items-center gap-2">
-        <button
-          v-for="level in roleFilters"
-          :key="level.value"
-          @click="setRole(level.value)"
-          class="rounded-full px-4 py-2 text-xs font-bold transition"
-          :class="
-            activeRole === level.value
-              ? 'bg-[#cf3d3d] text-white shadow-md shadow-[#cf3d3d]/10'
-              : 'bg-white text-slate-500 border border-slate-200 hover:border-[#cf3d3d]/40'
-          "
+      <div class="relative w-full sm:w-48">
+        <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#cf3d3d]">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+            <path d="M3 4.5h18M6 12h12M10 19h4" />
+          </svg>
+        </span>
+        <select
+          v-model="activeRole"
+          @change="fetchUsers(1)"
+          class="w-full appearance-none rounded-2xl border border-slate-200 bg-white py-3 pl-11 pr-9 text-sm font-bold text-slate-700 transition focus:border-[#cf3d3d]/40 focus:outline-none focus:ring-2 focus:ring-[#cf3d3d]/20"
         >
-          {{ level.label }}
-        </button>
+          <option v-for="level in roleFilters" :key="level.value" :value="level.value">
+            {{ level.label }}
+          </option>
+        </select>
+        <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
       </div>
     </div>
 
@@ -152,7 +158,7 @@ const activeRole = ref('all')
 const togglingId = ref(null)
 
 const roleFilters = [
-  { label: 'Semua', value: 'all' },
+  { label: 'Semua Role', value: 'all' },
   { label: 'Client', value: 'client' },
   { label: 'Teacher', value: 'teacher' },
   { label: 'Admin', value: 'admin' },
@@ -162,11 +168,6 @@ let searchTimer = null
 const onSearchInput = () => {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => fetchUsers(1), 350)
-}
-
-const setRole = (value) => {
-  activeRole.value = value
-  fetchUsers(1)
 }
 
 const changePage = (page) => {

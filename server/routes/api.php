@@ -42,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('users/{user}', [AdminController::class, 'updateUser']);
 
         Route::get('packages', [AdminController::class, 'packages']);
+        Route::post('packages', [AdminController::class, 'storePackage']);
         Route::patch('packages/{package}/toggle', [AdminController::class, 'togglePackage']);
 
         Route::get('orders', [AdminController::class, 'orders']);

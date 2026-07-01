@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
@@ -169,6 +170,9 @@ class AdminController extends Controller
                         ->orWhere('slug', 'like', "%{$search}%");
                 });
             })
+            ->with(['features' => function ($q) {
+                $q->orderBy('sort_order');
+            }])
             ->withCount(['orders as orders_count', 'enrollments as enrollments_count'])
             ->orderByDesc('is_active')
             ->latest()
@@ -181,7 +185,9 @@ class AdminController extends Controller
                 'name' => $package->name,
                 'slug' => $package->slug,
                 'type' => $package->type,
+                'icon' => $package->icon,
                 'level' => $package->level,
+                'description' => $package->description,
                 'price' => $package->price,
                 'price_formatted' => $package->price_formatted,
                 'duration_days' => $package->duration_days,
@@ -189,6 +195,10 @@ class AdminController extends Controller
                 'is_active' => $package->is_active,
                 'orders_count' => $package->orders_count,
                 'enrollments_count' => $package->enrollments_count,
+                'features' => $package->features->map(fn ($f) => [
+                    'id' => $f->id,
+                    'name' => $f->name,
+                ]),
                 'created_at' => $package->created_at?->diffForHumans(),
             ]),
         ]);
@@ -207,6 +217,79 @@ class AdminController extends Controller
                 'is_active' => $package->is_active,
             ],
         ]);
+    }
+
+    public function storePackage(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'min:3', 'max:120'],
+            'slug' => ['nullable', 'string', 'max:160', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
+            'type' => ['required', 'in:online,onsite'],
+            'icon' => ['nullable', 'string', 'max:255'],
+            'level' => ['nullable', 'string', 'max:120'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'duration_days' => ['required', 'integer', 'min:0'],
+            'is_active' => ['boolean'],
+            'features' => ['nullable', 'array'],
+            'features.*' => ['string', 'max:255'],
+        ], [
+            'slug.regex' => 'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung.',
+        ]);
+
+        $slug = $validated['slug'] ?? Str::slug($validated['name']);
+        $original = $slug;
+        $counter = 1;
+        while (Package::where('slug', $slug)->exists()) {
+            $slug = $original . '-' . $counter++;
+        }
+
+        $package = Package::create([
+            'name' => $validated['name'],
+            'slug' => $slug,
+            'type' => $validated['type'],
+            'icon' => $validated['icon'] ?? null,
+            'level' => $validated['level'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'price' => $validated['price'],
+            'duration_days' => $validated['duration_days'],
+            'is_active' => $validated['is_active'] ?? true,
+        ]);
+
+        $features = collect($validated['features'] ?? [])
+            ->map(fn ($name) => trim((string) $name))
+            ->filter(fn ($name) => $name !== '')
+            ->values();
+
+        foreach ($features as $index => $name) {
+            $package->features()->create([
+                'name' => $name,
+                'sort_order' => $index,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Paket berhasil ditambahkan.',
+            'data' => [
+                'id' => $package->id,
+                'name' => $package->name,
+                'slug' => $package->slug,
+                'type' => $package->type,
+                'icon' => $package->icon,
+                'level' => $package->level,
+                'description' => $package->description,
+                'price' => $package->price,
+                'price_formatted' => $package->price_formatted,
+                'duration_days' => $package->duration_days,
+                'duration_label' => $package->duration_label,
+                'is_active' => $package->is_active,
+                'features' => $package->features()->orderBy('sort_order')->get()->map(fn ($f) => [
+                    'id' => $f->id,
+                    'name' => $f->name,
+                ]),
+            ],
+        ], 201);
     }
 
     public function orders(Request $request): JsonResponse
