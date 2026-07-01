@@ -76,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('quizzes/{quiz}/start', [ClientQuizController::class, 'start']);
         Route::post('quizzes/{quiz}/submit', [ClientQuizController::class, 'submit']);
         Route::get('quiz-attempts', [ClientQuizController::class, 'history']);
+        Route::get('quiz-attempts/{attempt}', [ClientQuizController::class, 'show']);
     });
 });
 
