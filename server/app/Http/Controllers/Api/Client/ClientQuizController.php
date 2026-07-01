@@ -8,12 +8,62 @@ use App\Http\Resources\QuizAttemptResource;
 use App\Http\Resources\QuizResource;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
+use App\Models\Course;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ClientQuizController extends Controller
 {
+
+        /**
+     * Daftar quiz yang bisa diakses user (hanya dari kursus yang ia enroll),
+     * beserta skor terbaik yang pernah diraih.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        // ID course yang bisa diakses user (via enrollment -> package -> course)
+        $courseIds = Course::query()
+            ->active()
+            ->whereHas('packages', fn ($q) =>
+                $q->whereIn('packages.id', $user->enrollments()->pluck('package_id')))
+            ->pluck('id');
+
+        $quizzes = Quiz::query()
+            ->active()
+            ->whereIn('course_id', $courseIds)
+            ->with(['course:id,title,slug'])
+            ->withCount('questions')
+            ->addSelect([
+                'best_score' => QuizAttempt::query()
+                    ->select('score')
+                    ->whereColumn('quiz_id', 'quizzes.id')
+                    ->where('user_id', $user->id)
+                    ->orderByDesc('score')
+                    ->limit(1),
+            ])
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar quiz berhasil diambil.',
+            'data' => $quizzes->map(fn ($q) => [
+                'id'              => $q->id,
+                'title'           => $q->title,
+                'description'     => $q->description,
+                'passing_score'   => $q->passing_score,
+                'course'          => $q->course,
+                'questions_count' => $q->questions_count,
+                'best_score'      => $q->best_score,
+                'has_passed'      => $q->best_score !== null && $q->best_score >= $q->passing_score,
+            ]),
+        ]);
+    }
+
+
     public function start(Quiz $quiz): JsonResponse
     {
         abort_if(! $quiz->is_active || ! $quiz->course?->is_active, 404);
@@ -24,6 +74,7 @@ class ClientQuizController extends Controller
             'data' => new QuizResource($quiz->load('questions')),
         ]);
     }
+    
 
     public function submit(SubmitQuizRequest $request, Quiz $quiz): JsonResponse
     {

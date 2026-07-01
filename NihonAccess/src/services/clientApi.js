@@ -61,4 +61,13 @@ export const clientApi = {
     get: (id) => request(`/character-exercises/${id}`),
     submit: (body) => request('/character-exercises/submit', { method: 'POST', body }),
   },
+
+    quizzes: {
+    list: () => request('/quizzes'),
+    start: (quizId) => request(`/quizzes/${quizId}/start`),
+    submit: (quizId, body) => request(`/quizzes/${quizId}/submit`, { method: 'POST', body }),
+  },
+  quizAttempts: {
+    list: (query) => request('/quiz-attempts', { query }),
+  },
 }
