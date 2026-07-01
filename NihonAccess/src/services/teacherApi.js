@@ -101,4 +101,9 @@ export const teacherApi = {
     update: (id, body) => request(`/writing-exercises/${id}`, { method: 'PUT', body }),
     remove: (id) => request(`/writing-exercises/${id}`, { method: 'DELETE' }),
   },
+
+  aiGenerations: {
+    create: (body) => request('/ai-generations', { method: 'POST', body }),
+    status: (uuid) => request(`/ai-generations/${uuid}`),
+  },
 }

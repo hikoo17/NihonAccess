@@ -46,5 +46,12 @@ return [
         'endpoint' => env('WHATSAPP_GATEWAY_ENDPOINT', 'https://api.fonnte.com/send'),
         'token' => env('WHATSAPP_GATEWAY_TOKEN'),
     ],
+    
+    'gemini' => [
+        'api_key'  => env('GEMINI_API_KEY'),
+        'model'    => env('GEMINI_MODEL', 'gemini-2.5-flash'),
+        'base_url' => env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'),
+        'max_poll' => (int) env('GEMINI_MAX_POLL', 60), // percobaan polling tiap 2 detik
+    ],
 
 ];

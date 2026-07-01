@@ -16,7 +16,10 @@ use App\Http\Controllers\Api\Client\ClientCourseController;
 use App\Http\Controllers\Api\Client\ClientDashboardController;
 use App\Http\Controllers\Api\Client\ClientProfileController;
 use App\Http\Controllers\Api\Client\ClientQuizController;
+use App\Http\Controllers\Api\Teacher\AiGenerationController;
 use Illuminate\Support\Facades\Route;
+
+
 
 Route::get('/packages', [PackageController::class, 'index']);
 Route::get('/packages/{slug}', [PackageController::class, 'show']);
@@ -62,6 +65,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('listening-exercises', TeacherListeningController::class);
 
         Route::apiResource('writing-exercises', TeacherWritingController::class);
+
+        Route::post('ai-generations', [AiGenerationController::class, 'store'])->name('teacher.ai-generations.store');
+        Route::get('ai-generations/{uuid}', [AiGenerationController::class, 'status'])->name('teacher.ai-generations.status');
     });
 
     Route::prefix('client')->group(function () {

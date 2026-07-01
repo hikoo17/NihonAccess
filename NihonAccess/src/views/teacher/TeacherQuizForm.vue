@@ -70,13 +70,26 @@
             <h3 class="text-base font-extrabold text-slate-900">Daftar Soal</h3>
             <p class="text-sm font-medium text-slate-500">{{ form.questions.length }} soal</p>
           </div>
-          <Button variant="outline" size="sm" @click="addQuestion">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-            Tambah Soal
-          </Button>
+          <div class="flex items-center gap-2">
+            <Button variant="outline" size="sm" @click="addQuestion">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+              Tambah Soal
+            </Button>
+            <Button variant="secondary" size="sm" :disabled="!canGenerateAi || generating" :title="aiTooltip" @click="generateAi">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.455z" /></svg>
+              Generate Soal (AI)
+            </Button>
+          </div>
         </div>
 
-        <div v-if="form.questions.length === 0" class="rounded-2xl border border-dashed border-slate-200 py-10 text-center">
+        <div v-if="generating" class="rounded-2xl border border-slate-200 bg-slate-50 py-6 text-center">
+          <TeacherLoading label="AI sedang membuat soal..." />
+        </div>
+        <p v-if="genError" class="mt-2 text-xs font-semibold text-[#cf3d3d]">
+          {{ genError }} &mdash; <button class="underline" @click="generateAi">coba lagi</button>
+        </p>
+
+        <div v-if="form.questions.length === 0 && !generating" class="rounded-2xl border border-dashed border-slate-200 py-10 text-center">
           <p class="text-sm font-medium text-slate-400">Belum ada soal. Klik "Tambah Soal" untuk mulai.</p>
         </div>
 
@@ -136,6 +149,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { teacherApi } from '@/services/teacherApi'
 import { useTeacherOptions } from '@/composables/useTeacherOptions'
 import { useTeacherToast } from '@/composables/useTeacherToast'
+import { useAiGeneration } from '@/composables/useAiGeneration'
 import TeacherPageHeader from '@/components/teacher/ui/TeacherPageHeader.vue'
 import TeacherLoading from '@/components/teacher/ui/TeacherLoading.vue'
 import Button from '@/components/ui/Button.vue'
@@ -144,6 +158,7 @@ const route = useRoute()
 const router = useRouter()
 const { success, error } = useTeacherToast()
 const { courses, fetchCourses, fetchLessonsFor } = useTeacherOptions()
+const { generating, genError, start } = useAiGeneration()
 
 const editId = route.params.id
 const isEdit = computed(() => !!editId)
@@ -175,6 +190,38 @@ const addQuestion = () => {
 }
 const removeQuestion = (idx) => {
   form.questions.splice(idx, 1)
+}
+
+const selectedLesson = computed(() => lessons.value.find((l) => l.id === form.lesson_id))
+const canGenerateAi = computed(() => !!selectedLesson.value && !!selectedLesson.value.video_url)
+const aiTooltip = computed(() =>
+  !form.lesson_id ? 'Pilih lesson dulu'
+  : !selectedLesson.value?.video_url ? 'Lesson ini tidak punya video'
+  : 'Generate soal dari video lesson')
+
+const generateAi = async () => {
+  if (!canGenerateAi.value) {
+    error('Pilih lesson yang punya video terlebih dahulu.')
+    return
+  }
+  genError.value = ''
+  try {
+    const drafts = await start({
+      type: 'quiz',
+      payload: { lesson_id: Number(form.lesson_id), count: 5 },
+      toDraft: (result) => result.map((q) => ({
+        question: q.question,
+        optionsText: (q.options || []).join('\n'),
+        correct_answer: q.correct_answer,
+        explanation: q.explanation || '',
+        sort_order: form.questions.length,
+      })),
+    })
+    form.questions.push(...drafts)
+    success(`${drafts.length} soal ditambahkan. Edit dulu sebelum simpan.`)
+  } catch (e) {
+    error(e.message || 'Gagal generate soal.')
+  }
 }
 
 const loadLessons = async (cid) => {
