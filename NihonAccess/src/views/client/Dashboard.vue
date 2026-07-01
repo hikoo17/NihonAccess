@@ -1,9 +1,7 @@
 <template>
   <div class="mx-auto max-w-6xl space-y-8">
     <div>
-      <Breadcrumb
-        :items="[{ label: 'Beranda', to: '/' }, { label: 'Dashboard' }]"
-      />
+      <Breadcrumb :items="[{ label: 'Dashboard' }]" />
       <h1
         class="mt-3 text-2xl font-extrabold tracking-tight text-slate-800 sm:text-3xl"
       >

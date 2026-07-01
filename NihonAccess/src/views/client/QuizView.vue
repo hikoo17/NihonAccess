@@ -37,18 +37,17 @@
       <div class="flex items-center justify-between">
         <Breadcrumb
           :items="[
-            { label: 'Kursus Saya', to: '/client/my-courses' },
-            { label: quiz?.course?.title || 'Kursus', to: quiz?.course_id ? `/client/my-courses/${quiz.course_id}/learn` : '/client/my-courses' },
+            { label: 'quiz', to: '/client/quiz' },
+            { label: quiz?.course?.title || 'Kursus' },
             { label: quiz?.title || 'Quiz' },
           ]"
         />
-        <RouterLink
-          v-if="quiz?.course_id"
-          :to="`/client/my-courses/${quiz.course_id}/learn`"
-          class="text-xs font-bold text-slate-400 hover:text-[#cf3d3d]"
-        >
-          ← Kembali ke Kursus
-        </RouterLink>
+<RouterLink
+  to="/client/quiz"
+  class="text-xs font-bold text-slate-400 hover:text-[#cf3d3d]"
+>
+  ← Kembali ke Daftar Quiz
+</RouterLink>
       </div>
 
       <!-- Quiz header -->
