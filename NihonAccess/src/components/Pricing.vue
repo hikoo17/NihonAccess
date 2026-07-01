@@ -34,8 +34,29 @@
         </div>
       </div>
 
-      <div v-if="isLoading" class="flex items-center justify-center py-16">
-        <div class="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#cf3d3d]"></div>
+      <div v-if="isLoading" class="mt-12 grid gap-8 md:grid-cols-3 items-stretch">
+        <div v-for="n in 3" :key="`sk-${n}`" class="flex flex-col justify-between rounded-[2rem] bg-white p-8 border border-slate-100 shadow-sm">
+          <div>
+            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 mb-6">
+              <Skeleton width="1.25rem" height="1.25rem" rounded="lg" />
+            </div>
+            <Skeleton width="60%" height="1.5rem" />
+            <div class="mt-4 space-y-2">
+              <Skeleton width="100%" height="0.75rem" />
+              <Skeleton width="85%" height="0.75rem" />
+            </div>
+            <div class="mt-6">
+              <Skeleton width="45%" height="1.875rem" />
+            </div>
+            <div class="mt-8 space-y-3.5">
+              <div v-for="i in 4" :key="i" class="flex items-center gap-3">
+                <Skeleton width="1.25rem" height="1.25rem" rounded="full" />
+                <Skeleton :width="i % 2 ? '70%' : '55%'" height="0.875rem" />
+              </div>
+            </div>
+          </div>
+          <Skeleton width="100%" height="3.25rem" rounded="2xl" class="mt-8" />
+        </div>
       </div>
 
       <div v-else-if="loadError" class="py-16 text-center text-sm text-slate-500">
@@ -95,6 +116,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { fetchPackages } from '../lib/packages.js'
+import Skeleton from './ui/Skeleton.vue'
 
 const activeType = ref('online')
 const pricingData = ref([])
