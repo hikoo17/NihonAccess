@@ -2,7 +2,7 @@
   <div class="animate-fadeIn">
     <TeacherPageHeader
       eyebrow="Course & Lesson"
-      title="Course Saya"
+      
       subtitle="Daftar course yang Anda kelola. Klik untuk mengelola lesson di dalamnya."
     >
       <template #actions>
