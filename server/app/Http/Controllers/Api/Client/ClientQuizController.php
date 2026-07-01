@@ -100,8 +100,19 @@ class ClientQuizController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Jawaban quiz berhasil dikirim.',
-            'data' => new QuizAttemptResource($attempt->load('quiz')),
+            'data' => new QuizAttemptResource($attempt->load(['quiz.course', 'quiz.questions'])),
         ], 201);
+    }
+
+        public function show(Request $request, QuizAttempt $attempt): JsonResponse
+    {
+        abort_if($attempt->user_id !== $request->user()->id, 403, 'Akses ditolak.');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail attempt berhasil diambil.',
+            'data'    => new QuizAttemptResource($attempt->load(['quiz.course', 'quiz.questions'])),
+        ]);
     }
 
     public function history(Request $request): JsonResponse

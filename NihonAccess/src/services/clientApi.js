@@ -73,5 +73,7 @@ export const clientApi = {
   },
   quizAttempts: {
     list: (query) => request('/quiz-attempts', { query }),
+    get: (id) => request(`/quiz-attempts/${id}`),
+
   },
 }
