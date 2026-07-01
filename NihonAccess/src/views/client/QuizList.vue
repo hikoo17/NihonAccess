@@ -47,40 +47,68 @@
 
     <!-- List -->
     <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <Card v-for="quiz in quizzes" :key="quiz.id" class="flex flex-col p-5">
-        <div class="flex items-start justify-between gap-3">
-          <div class="flex-1">
-            <h3 class="font-bold text-slate-800">{{ quiz.title }}</h3>
-            <p class="mt-0.5 text-xs text-slate-400">
-              {{ quiz.course?.title ?? 'Kursus' }}
-            </p>
-          </div>
-          <Badge
-            :variant="quiz.has_passed ? 'success' : quiz.best_score !== null ? 'warning' : 'neutral'"
-            size="sm"
-          >
-            {{ quiz.has_passed ? 'Lulus' : quiz.best_score !== null ? 'Belum Lulus' : 'Belum Dikerjakan' }}
-          </Badge>
-        </div>
+    <Card 
+        v-for="quiz in quizzes" 
+        :key="quiz.id" 
+        class="relative overflow-hidden rounded-2xl border border-slate-100 shadow-sm bg-white/60 min-h-[180px]"
+        :style="{ 
+            backgroundImage: `url(${quiz.id === 'hiragana' ? '/hiragana.png' : '/kanji.png'})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+        }"
+    >
+        <!-- overlay gradient putih dari kiri supaya teks tetap kontras -->
+        <div class="absolute inset-0 bg-gradient-to-r from-white/85 via-white/60 to-transparent"></div>
 
-        <p class="mt-3 line-clamp-2 text-sm text-slate-500">
-          {{ quiz.description || 'Kerjakan quiz ini untuk menguji pemahamanmu.' }}
-        </p>
+        <!-- konten di atas overlay -->
+        <div class="relative z-10 flex h-full flex-col justify-between p-6">
+            <div>
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-slate-800">{{ quiz.title }}</h3>
+                        <p class="mt-0.5 text-xs font-medium text-coral-400">
+                            {{ quiz.course?.title ?? 'Kursus' }}
+                        </p>
+                    </div>
+                    <Badge
+                        :variant="quiz.has_passed ? 'success' : quiz.best_score !== null ? 'warning' : 'neutral'"
+                        size="sm"
+                        class="rounded-full px-3 py-1 font-semibold text-[11px]"
+                    >
+                        {{ quiz.has_passed ? 'Lulus' : quiz.best_score !== null ? 'Belum Lulus' : 'Belum Dikerjakan' }}
+                    </Badge>
+                </div>
 
-        <div class="mt-4 flex flex-wrap items-center gap-4 text-[11px] font-semibold text-slate-500">
-          <span class="flex items-center gap-1">📝 {{ quiz.questions_count }} soal</span>
-          <span class="flex items-center gap-1">🎯 Lulus ≥ {{ quiz.passing_score }}</span>
-          <span v-if="quiz.best_score !== null" class="flex items-center gap-1">
-            🏆 Skor {{ quiz.best_score }}
-          </span>
-        </div>
+                <p class="mt-3 line-clamp-2 text-sm text-slate-500 max-w-[450px]">
+                    {{ quiz.description || 'Kerjakan quiz ini untuk menguji pemahamanmu.' }}
+                </p>
 
-        <div class="mt-4 border-t border-slate-100 pt-3">
-          <Button size="sm" @click="start(quiz.id)">
-            {{ quiz.best_score === null ? 'Mulai Quiz' : 'Coba Lagi' }} →
-          </Button>
+                <div class="mt-4 flex flex-wrap items-center gap-3 text-xs font-medium text-slate-500">
+                    <span class="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100">
+                        📄 {{ quiz.questions_count }} soal
+                    </span>
+                    <span class="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100">
+                        🎯 Lulus ≥ {{ quiz.passing_score }}
+                    </span>
+                    <span v-if="quiz.best_score !== null" class="flex items-center gap-1.5 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-md border border-amber-100">
+                        🏆 Skor {{ quiz.best_score }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-1">
+                <Button 
+                    size="sm" 
+                    @click="start(quiz.id)"
+                    :class="quiz.best_score === null ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700'"
+                    class="text-white px-5 py-2 rounded-xl font-semibold shadow-md transition-all duration-200"
+                >
+                    {{ quiz.best_score === null ? 'Mulai Quiz' : 'Coba Lagi' }} →
+                </Button>
+            </div>
         </div>
-      </Card>
+    </Card>
     </div>
   </div>
 </template>
