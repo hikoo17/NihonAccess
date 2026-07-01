@@ -21,6 +21,7 @@ class User extends Authenticatable
         'is_active',
         'email_verified_at',
         'registration_id',
+        'last_login_at',
     ];
 
     protected $hidden = [
@@ -32,6 +33,7 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_active' => 'boolean',
         'email_verified_at' => 'datetime',
+        'last_login_at' => 'datetime',
     ];
 
     public function registration(): BelongsTo

@@ -50,6 +50,9 @@ class AuthController extends Controller
         // 7. Buat token Sanctum
         $token = $user->createToken('api-token')->plainTextToken;
 
+        // 8. Catat waktu login terakhir
+        $user->forceFill(['last_login_at' => now()])->save();
+
         return $this->successResponse('Login berhasil.', [
             'token' => $token,
             'token_type' => 'Bearer',

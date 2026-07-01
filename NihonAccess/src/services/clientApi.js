@@ -48,6 +48,10 @@ export const clientApi = {
   courseLessons: (enrollmentId) => request(`/my-courses/${enrollmentId}/lessons`),
   completeLesson: (lessonId) => request(`/lessons/${lessonId}/complete`, { method: 'POST' }),
 
+  profile: {
+    get: () => request('/profile'),
+  },
+
   // Endpoint lain bisa ditambahkan di sini nanti, contoh:
   // courses: {
   //   list: (query) => request('/courses', { query }),

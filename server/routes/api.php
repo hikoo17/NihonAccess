@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Teacher\TeacherWritingController;
 use App\Http\Controllers\Api\Client\ClientCharacterController;
 use App\Http\Controllers\Api\Client\ClientCourseController;
 use App\Http\Controllers\Api\Client\ClientDashboardController;
+use App\Http\Controllers\Api\Client\ClientProfileController;
 use App\Http\Controllers\Api\Client\ClientQuizController;
 use Illuminate\Support\Facades\Route;
 
@@ -76,6 +77,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('quizzes/{quiz}/start', [ClientQuizController::class, 'start']);
         Route::post('quizzes/{quiz}/submit', [ClientQuizController::class, 'submit']);
         Route::get('quiz-attempts', [ClientQuizController::class, 'history']);
+
+        Route::get('profile', [ClientProfileController::class, 'show']);
     });
 });
 
