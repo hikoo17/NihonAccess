@@ -157,7 +157,7 @@
                 </div>
               </li>
 
-              <!-- Tanggal Bergabung -->
+              <!-- Masa Berlaku Paket -->
               <li class="flex items-center gap-4">
                 <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#cf3d3d]/10 text-[#cf3d3d]">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
@@ -165,8 +165,15 @@
                   </svg>
                 </div>
                 <div class="min-w-0 flex-1">
-                  <p class="text-xs font-medium text-slate-400">Tanggal Bergabung</p>
-                  <p class="truncate text-sm font-bold text-slate-800">{{ formatDate(profile.created_at) }}</p>
+                  <p class="text-xs font-medium text-slate-400">Masa Berlaku Paket</p>
+                  <div class="flex items-center gap-2">
+                    <p class="truncate text-sm font-bold text-slate-800">
+                      {{ profile.package_expiry ? formatDate(profile.package_expiry) : 'Tidak ada paket aktif' }}
+                    </p>
+                    <Badge v-if="profile.package_expiry" :variant="profile.package_expired ? 'danger' : 'success'" size="sm">
+                      {{ profile.package_expired ? 'Kedaluwarsa' : 'Aktif' }}
+                    </Badge>
+                  </div>
                 </div>
               </li>
             </ul>
@@ -197,6 +204,9 @@ const profile = ref({
   is_active: false,
   email_verified_at: null,
   created_at: null,
+  package_expiry: null,
+  package_name: null,
+  package_expired: false,
 })
 
 const roleLabelMap = { admin: 'Admin', teacher: 'Pengajar', client: 'Member' }
