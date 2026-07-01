@@ -23,9 +23,27 @@
       <p class="text-xs text-slate-400">{{ packages.length }} paket ditemukan</p>
     </div>
 
-    <!-- Loading -->
-    <div v-if="isLoading" class="flex items-center justify-center py-24">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#cf3d3d]"></div>
+    <!-- Loading skeleton -->
+    <div v-if="isLoading" class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div v-for="n in 6" :key="`sk-${n}`" class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <Skeleton width="3rem" height="3rem" rounded="2xl" />
+            <div class="space-y-1.5">
+              <Skeleton width="8rem" />
+              <Skeleton width="5rem" height="0.75rem" />
+            </div>
+          </div>
+          <Skeleton width="3rem" height="1.25rem" rounded="full" />
+        </div>
+        <div class="mt-5 grid grid-cols-2 gap-3">
+          <Skeleton width="100%" height="3rem" rounded="xl" />
+          <Skeleton width="100%" height="3rem" rounded="xl" />
+        </div>
+        <div class="mt-5 flex justify-end">
+          <Skeleton width="6rem" height="2rem" rounded="xl" />
+        </div>
+      </div>
     </div>
 
     <!-- Empty -->
@@ -89,6 +107,7 @@
 import { ref, onMounted } from 'vue'
 import Breadcrumb from '@/components/ui/Breadcrumb.vue'
 import Input from '@/components/ui/Input.vue'
+import Skeleton from '@/components/ui/Skeleton.vue'
 import { fireToast } from '@/lib/swal.js'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'

@@ -65,13 +65,22 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-50 text-sm">
-            <tr v-if="isLoading">
-              <td colspan="7" class="p-12 text-center">
-                <div
-                  class="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-slate-200 border-t-[#cf3d3d]"
-                ></div>
-              </td>
-            </tr>
+            <template v-if="isLoading">
+              <tr v-for="n in 6" :key="`sk-${n}`" class="border-b border-slate-50">
+                <td class="p-4 px-6"><Skeleton width="6rem" height="0.75rem" /></td>
+                <td class="p-4 px-6">
+                  <div class="space-y-1.5">
+                    <Skeleton width="8rem" />
+                    <Skeleton width="10rem" height="0.625rem" />
+                  </div>
+                </td>
+                <td class="p-4 px-6"><Skeleton width="7rem" /></td>
+                <td class="p-4 px-6"><Skeleton width="6rem" /></td>
+                <td class="p-4 px-6"><Skeleton width="4rem" height="1.25rem" rounded="full" /></td>
+                <td class="p-4 px-6"><Skeleton width="5rem" height="0.75rem" /></td>
+                <td class="p-4 px-6"><Skeleton width="5rem" height="0.75rem" /></td>
+              </tr>
+            </template>
             <tr v-else-if="orders.length === 0">
               <td colspan="7" class="p-12 text-center text-sm text-slate-400">
                 Tidak ada pesanan ditemukan.
@@ -151,6 +160,7 @@
 import { ref, onMounted } from "vue";
 import Breadcrumb from "@/components/ui/Breadcrumb.vue";
 import Input from "@/components/ui/Input.vue";
+import Skeleton from "@/components/ui/Skeleton.vue";
 import { fireToast } from "@/lib/swal.js";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";

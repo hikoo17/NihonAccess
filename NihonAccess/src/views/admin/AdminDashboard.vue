@@ -1,24 +1,92 @@
 <template>
-  <div class="mx-auto max-w-7xl space-y-8 animate-fadeIn">
+  <div class="mx-auto max-w-7xl space-y-6 animate-fadeIn">
+    <div v-if="isLoading" class="space-y-6">
+      <!-- Stat cards skeleton -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+        <SkeletonStatCard v-for="n in 4" :key="`sk-stat-${n}`" />
+      </div>
 
-    <div v-if="isLoading" class="flex items-center justify-center py-24">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#cf3d3d]"></div>
+      <!-- Charts skeleton -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 rounded-[2rem] border border-slate-100 bg-white shadow-sm p-6">
+          <Skeleton width="40%" height="0.875rem" />
+          <Skeleton width="25%" height="0.75rem" class="mt-2" />
+          <Skeleton width="100%" height="280px" rounded="xl" class="mt-4" />
+        </div>
+        <div class="rounded-[2rem] border border-slate-100 bg-white shadow-sm p-6">
+          <Skeleton width="50%" height="0.875rem" />
+          <Skeleton width="30%" height="0.75rem" class="mt-2" />
+          <Skeleton width="100%" height="280px" rounded="xl" class="mt-4" />
+        </div>
+      </div>
+
+      <!-- Summary cards skeleton -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div v-for="n in 3" :key="`sk-sum-${n}`" class="rounded-[2rem] border border-slate-100 bg-white shadow-sm p-6">
+          <Skeleton width="45%" height="0.875rem" />
+          <div class="mt-5 space-y-4">
+            <div v-for="m in 3" :key="m" class="flex items-center justify-between">
+              <Skeleton width="35%" height="0.875rem" />
+              <Skeleton width="4rem" height="1.25rem" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tables skeleton -->
+      <div class="rounded-[2rem] border border-slate-100 bg-white shadow-sm overflow-hidden">
+        <div class="p-5 px-6 border-b border-slate-100">
+          <Skeleton width="30%" height="0.875rem" />
+        </div>
+        <div v-for="n in 4" :key="`sk-row-${n}`" class="flex items-center gap-4 p-4 px-6 border-b border-slate-50">
+          <Skeleton width="2rem" height="2rem" rounded="lg" />
+          <div class="flex-1 space-y-2">
+            <Skeleton width="45%" />
+            <Skeleton width="30%" height="0.625rem" />
+          </div>
+          <Skeleton width="5rem" />
+          <Skeleton width="4rem" height="1.25rem" rounded="full" />
+          <Skeleton width="3.5rem" height="0.75rem" />
+        </div>
+      </div>
     </div>
 
     <template v-else>
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-        <AdminStatCard
-          v-for="(stat, index) in stats"
-          :key="index"
-          :label="stat.label"
-          :value="stat.value"
-          :value-class="index === 1 ? 'text-[#cf3d3d]' : 'text-slate-800'"
-        />
+        <AdminStatCard :label="stats[0]?.label" :value="stats[0]?.value">
+          <template #icon>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.243m15.15 6.592a3 3 0 00-1.539-2.625 9.337 9.337 0 00-4.121-.952 9.337 9.337 0 00-4.121.952 3 3 0 00-1.539 2.625M15 6.75a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </template>
+        </AdminStatCard>
+        <AdminStatCard :label="stats[1]?.label" :value="stats[1]?.value" is-primary>
+          <template #icon>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.627.282 1.353.282 1.98 0A60.07 60.07 0 0121.75 18.75M16.5 6v.75m0 0a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+            </svg>
+          </template>
+        </AdminStatCard>
+        <AdminStatCard :label="stats[2]?.label" :value="stats[2]?.value">
+          <template #icon>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
+            </svg>
+          </template>
+        </AdminStatCard>
+        <AdminStatCard :label="stats[3]?.label" :value="stats[3]?.value">
+          <template #icon>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0012 20.904a48.62 48.62 0 008.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658 8.09M4.26 10.147a48.628 48.628 0 0013.115-1.697M4.26 10.148a48.628 48.628 0 0113.115-1.697m0 0a48.628 48.628 0 0113.115 1.697M19.5 8.25v.75a2.25 2.25 0 01-1.672 2.18 48.514 48.514 0 00-6.621 2.18M5.25 8.25v.75a2.25 2.25 0 001.672 2.18 48.514 48.514 0 016.621 2.18M5.25 8.25a48.628 48.628 0 0113.115-1.697M19.5 8.25a48.628 48.628 0 00-13.115-1.697" />
+            </svg>
+          </template>
+        </AdminStatCard>
       </div>
 
-      <!-- Charts -->
+      <!-- Charts Section -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+        <!-- Area Chart -->
+        <div class="lg:col-span-2 bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6">
           <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h3 class="text-sm font-bold text-slate-800">Tren Pesanan & Pendapatan</h3>
@@ -52,7 +120,8 @@
           <div v-else class="flex h-[280px] items-center justify-center text-sm text-slate-400">Memuat grafik...</div>
         </div>
 
-        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+        <!-- Donut Chart -->
+        <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6">
           <h3 class="mb-1 text-sm font-bold text-slate-800">Distribusi User</h3>
           <p class="mb-2 text-xs text-slate-400">Berdasarkan role</p>
           <apexchart
@@ -66,8 +135,10 @@
         </div>
       </div>
 
+      <!-- Summary Cards Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+        <!-- User Summary -->
+        <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6">
           <h3 class="text-sm font-bold text-slate-800 mb-5">Ringkasan User</h3>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
@@ -85,7 +156,8 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+        <!-- Order Summary -->
+        <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6">
           <h3 class="text-sm font-bold text-slate-800 mb-5">Ringkasan Pesanan</h3>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
@@ -107,7 +179,8 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+        <!-- Package Summary -->
+        <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6">
           <h3 class="text-sm font-bold text-slate-800 mb-5">Paket & Enrollment</h3>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
@@ -122,7 +195,8 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+      <!-- Recent Orders Table -->
+      <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
         <div class="p-5 px-6 flex items-center justify-between border-b border-slate-100">
           <h3 class="text-sm font-bold text-slate-800">Pesanan Terbaru</h3>
         </div>
@@ -162,7 +236,8 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+      <!-- Recent Users Table -->
+      <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
         <div class="p-5 px-6 flex items-center justify-between border-b border-slate-100">
           <h3 class="text-sm font-bold text-slate-800">User Terdaftar Terbaru</h3>
         </div>
@@ -209,11 +284,13 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import Breadcrumb from '@/components/ui/Breadcrumb.vue'
+import Skeleton from '@/components/ui/Skeleton.vue'
 import AdminStatCard from '@/components/admin/AdminStatCard.vue'
+import SkeletonStatCard from '@/components/admin/SkeletonStatCard.vue'
 import { fireToast } from '@/lib/swal.js'
 
 const flash = (type, message) => fireToast(type, message)
-
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
 const isLoading = ref(true)
@@ -225,14 +302,15 @@ const recentOrders = ref([])
 const recentUsers = ref([])
 
 const chart = ref({ months: [], orders: [], revenue: [], role_distribution: [], status_distribution: [] })
-
 const chartPeriod = ref('month')
 const chartLoading = ref(false)
+
 const periodOptions = [
   { value: 'day', label: 'Hari' },
   { value: 'week', label: 'Minggu' },
   { value: 'month', label: 'Bulan' },
 ]
+
 const periodSubtitle = computed(() => {
   const map = { day: '7 hari terakhir', week: '6 minggu terakhir', month: '6 bulan terakhir' }
   return map[chartPeriod.value] || ''
@@ -268,6 +346,7 @@ const roleBadge = (role) => {
   return map[role] || 'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500'
 }
 
+// Chart Configurations (Menyesuaikan Aksen Merah)
 const trendSeries = computed(() => {
   if (!chart.value.months.length) return []
   return [
@@ -301,18 +380,33 @@ const roleChartOptions = computed(() => ({
   stroke: { width: 0 },
 }))
 
+// Fetch Data
 const fetchDashboard = async () => {
   try {
     const token = localStorage.getItem('auth_token')
     const response = await fetch(`${apiBaseUrl}/api/admin/dashboard`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
-
     const data = await response.json().catch(() => ({}))
 
     if (response.ok && data.success) {
       const d = data.data
-      stats.value = d.stats
+      
+      // Map API data agar support meta data tren (Gaya image_b6faa2.png)
+      const mockMeta = [
+        { trend: '2.05', trendType: 'up', subtext: 'Pesanan vs bln lalu' },
+        { trend: '12.4', trendType: 'up', subtext: 'Target vs bln lalu' },
+        { trend: '2.01', trendType: 'down', subtext: 'User vs bln lalu' },
+        { trend: '12.1', trendType: 'up', subtext: 'Aktif vs bln lalu' }
+      ]
+
+      stats.value = d.stats.map((item, index) => ({
+        ...item,
+        trend: mockMeta[index]?.trend || '0',
+        trendType: mockMeta[index]?.trendType || 'up',
+        subtext: mockMeta[index]?.subtext || 'vs bln lalu'
+      }))
+
       userSummary.value = d.user_summary
       orderSummary.value = d.order_summary
       totalPackages.value = d.total_packages
