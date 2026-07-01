@@ -66,7 +66,7 @@ const routes = [
   {
     path: '/client',
     component: () => import('@/components/Client/ClientShell.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, role: 'client' },
     children: [
       { path: '', redirect: '/client/dashboard' },
       { path: 'dashboard', name: 'client-dashboard', component: () => import('@/views/client/Dashboard.vue'), meta: { title: 'Dashboard | Client' } },
@@ -97,17 +97,37 @@ const router = createRouter({
   }
 })
 
-// --- PERBAIKAN LOGIKA DI SINI ---
-router.afterEach((to) => {
-  if (to.meta.title) {
-    // Jika route punya meta.title langsung (seperti Home), pakai itu
-    document.title = to.meta.title
-  } else {
-    // Jika route dinamis (Detail / Pendaftaran)
-    const packageTitle = packageTitles[to.params.type] || 'Paket Kursus'
-    const prefix = to.meta.titlePrefix ? `${to.meta.titlePrefix} ` : ''
-    document.title = `${prefix}${packageTitle} | NihonAccess`
+// === Tambahan: role home tiap role (buat redirect kalau salah area) ===
+const roleHome = {
+  admin: { name: 'AdminDashboard' },
+  teacher: { name: 'TeacherDashboard' },
+  client: { name: 'client-dashboard' },
+}
+
+router.beforeEach((to) => {
+  const token = localStorage.getItem('auth_token')
+  const role = localStorage.getItem('user_role')
+
+  // Ambil role route terdekat yang punya meta.role (parent atau sendiri)
+  const requiredRole = to.matched.find((r) => r.meta?.role)?.meta.role
+  const requiresAuth = to.matched.some((r) => r.meta?.requiresAuth)
+
+  // 1. Belum login tapi mau akses route protected → tend ke login
+  if (requiresAuth && !token) {
+    return { name: 'Login', query: { redirect: to.fullPath } }
   }
+
+  // 2. Sudah login tapi akses route milik role lain → tend balik ke rumah sendiri
+  if (requiredRole && role && requiredRole !== role) {
+    return roleHome[role] || { name: 'Home' }
+  }
+
+  // 3. Sudah login tapi balik ke /login → tend ke dashboard masing-masing
+  if (to.name === 'Login' && token && role) {
+    return roleHome[role] || { name: 'Home' }
+  }
+
+  return true
 })
 
 export default router
