@@ -210,6 +210,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import AdminStatCard from '@/components/admin/AdminStatCard.vue'
+import { fireToast } from '@/lib/swal.js'
+
+const flash = (type, message) => fireToast(type, message)
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
@@ -317,7 +320,7 @@ const fetchDashboard = async () => {
       recentUsers.value = d.recent_users
     }
   } catch (error) {
-    console.error('Gagal memuat data dashboard:', error)
+    flash('error', 'Gagal memuat data dashboard.')
   } finally {
     isLoading.value = false
   }
@@ -331,13 +334,12 @@ const fetchChartData = async () => {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     const data = await response.json().catch(() => ({}))
-    console.log(data)
 
     if (response.ok && data.success) {
       chart.value = data.data
     }
   } catch (error) {
-    console.error('Gagal memuat data chart:', error)
+    flash('error', 'Gagal memuat data chart.')
   } finally {
     chartLoading.value = false
   }

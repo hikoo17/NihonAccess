@@ -58,6 +58,7 @@ import FAQ from '../../components/FAQ.vue'
 import FinalCTA from '../../components/FinalCTA.vue'
 import Footer from '../../components/Footer.vue'
 import { checkRegistrationStatus, confirmSnapPayment, loadMidtransSnap, syncRegistrationPayment } from '../../lib/midtrans.js'
+import { fireAlert } from '../../lib/swal.js'
 
 const storageKey = 'nihonaccess-registration-form'
 const pendingRegistration = ref(null)
@@ -121,7 +122,7 @@ const continuePayment = async () => {
       pendingRegistration.value = readSavedRegistration()
     },
     onError: () => {
-      alert('Pembayaran belum bisa dilanjutkan. Silakan coba lagi beberapa saat lagi.')
+      fireAlert({ icon: 'error', title: 'Pembayaran Gagal', text: 'Pembayaran belum bisa dilanjutkan. Silakan coba lagi beberapa saat lagi.' })
     },
   })
 }

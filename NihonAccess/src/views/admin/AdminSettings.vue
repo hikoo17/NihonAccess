@@ -15,11 +15,6 @@
       </p>
     </div>
 
-    <div v-if="alert" class="rounded-2xl border px-4 py-3 text-sm font-medium"
-      :class="alert.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-[#cf3d3d]/20 bg-[#cf3d3d]/5 text-[#cf3d3d]'">
-      {{ alert.message }}
-    </div>
-
     <!-- Profile -->
     <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 sm:p-8">
       <div class="mb-6 flex items-center gap-4">
@@ -103,6 +98,7 @@ import Breadcrumb from '@/components/ui/Breadcrumb.vue'
 import Button from '@/components/ui/Button.vue'
 import Input from '@/components/ui/Input.vue'
 import Label from '@/components/ui/Label.vue'
+import { fireToast } from '@/lib/swal.js'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
@@ -112,15 +108,11 @@ const pwForm = ref({ current_password: '', password: '', password_confirmation: 
 
 const savingProfile = ref(false)
 const savingPassword = ref(false)
-const alert = ref(null)
 const pwError = ref('')
 
 const initials = ref('AD')
 
-const flash = (type, message) => {
-  alert.value = { type, message }
-  setTimeout(() => (alert.value = null), 3000)
-}
+const flash = (type, message) => fireToast(type, message)
 
 const fetchProfile = async () => {
   try {

@@ -15,11 +15,6 @@
       </p>
     </div>
 
-    <div v-if="alert" class="rounded-2xl border px-4 py-3 text-sm font-medium"
-      :class="alert.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-[#cf3d3d]/20 bg-[#cf3d3d]/5 text-[#cf3d3d]'">
-      {{ alert.message }}
-    </div>
-
     <!-- Filter -->
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="relative max-w-xs flex-1">
@@ -133,6 +128,7 @@
 import { ref, onMounted } from 'vue'
 import Breadcrumb from '@/components/ui/Breadcrumb.vue'
 import Input from '@/components/ui/Input.vue'
+import { fireToast } from '@/lib/swal.js'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
@@ -142,7 +138,6 @@ const meta = ref({ current_page: 1, last_page: 1, per_page: 10, total: 0 })
 const search = ref('')
 const activeRole = ref('all')
 const togglingId = ref(null)
-const alert = ref(null)
 
 const roleFilters = [
   { label: 'Semua', value: 'all' },
@@ -176,10 +171,7 @@ const roleBadge = (role) => {
   return map[role] || 'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500'
 }
 
-const flash = (type, message) => {
-  alert.value = { type, message }
-  setTimeout(() => (alert.value = null), 3000)
-}
+const flash = (type, message) => fireToast(type, message)
 
 const fetchUsers = async (page = meta.value.current_page) => {
   isLoading.value = true

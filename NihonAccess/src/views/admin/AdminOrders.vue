@@ -151,6 +151,7 @@
 import { ref, onMounted } from "vue";
 import Breadcrumb from "@/components/ui/Breadcrumb.vue";
 import Input from "@/components/ui/Input.vue";
+import { fireToast } from "@/lib/swal.js";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
@@ -202,6 +203,8 @@ const statusBadge = (status) => {
   );
 };
 
+const flash = (type, message) => fireToast(type, message);
+
 const fetchOrders = async (page = meta.value.current_page) => {
   isLoading.value = true;
   try {
@@ -233,10 +236,10 @@ if (res.ok && data.success) {
     total: 0
   }
 } else {
-  flash('error', data.message || 'Gagal memuat data user.')
-}
+  flash("error", data.message || "Gagal memuat data pesanan.");
+  }
   } catch (e) {
-    console.error("Gagal memuat pesanan:", e);
+    flash("error", "Tidak dapat terhubung ke server.");
   } finally {
     isLoading.value = false;
   }

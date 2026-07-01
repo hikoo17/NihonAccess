@@ -122,6 +122,7 @@ import Input from "../../components/ui/Input.vue";
 import Label from "../../components/ui/Label.vue";
 import Select from "../../components/ui/Select.vue"; // Di-import kembali
 import { confirmSnapPayment, createMidtransTransaction, loadMidtransSnap, syncRegistrationPayment } from "../../lib/midtrans.js";
+import { fireAlert } from "../../lib/swal.js";
 
 const props = defineProps({
   type: { type: String, required: false, default: "" }, // Ubah ke optional untuk rute Navbar umum
@@ -193,7 +194,7 @@ const handleSubmit = async () => {
       payment_token: midtransToken
     }));
 
-    alert("Data pendaftaran berhasil disimpan! Membuka gerbang pembayaran...");
+    await fireAlert({ icon: "success", title: "Data Tersimpan", text: "Data pendaftaran berhasil disimpan! Membuka gerbang pembayaran..." });
 
     // 4. Muat library Midtrans Snap secara dinamis
     await loadMidtransSnap();
@@ -216,40 +217,40 @@ onSuccess: async (result) => {
           // Pastikan backend merespons dengan status sukses
           if (syncResult && (syncResult.payment_status === 'success' || syncResult.status === 'success')) {
             localStorage.removeItem(storageKey);
-            alert("Pembayaran berhasil diverifikasi!");
+            await fireAlert({ icon: "success", title: "Pembayaran Berhasil", text: "Pembayaran berhasil diverifikasi!" });
           } else {
-            alert("Pembayaran berhasil, tetapi sistem sedang memverifikasi data Anda.");
+            await fireAlert({ icon: "info", title: "Sedang Diverifikasi", text: "Pembayaran berhasil, tetapi sistem sedang memverifikasi data Anda." });
           }
         } catch (error) {
           console.error("Gagal sinkronisasi data:", error);
-          alert("Gagal mencocokkan status pembayaran. Silakan cek email Anda secara berkala.");
+          await fireAlert({ icon: "error", title: "Gagal Mencocokkan", text: "Gagal mencocokkan status pembayaran. Silakan cek email Anda secara berkala." });
         } finally {
           isSubmitting.value = false;
           // Pindahkan ke halaman cek email setelah proses try-catch selesai dieksekusi
           router.push({ path: '/cek-email-verifikasi', query: { order_id: orderId } });
         }
       },
-      onPending: (result) => {
+      onPending: async (result) => {
         isSubmitting.value = false;
-        alert('Pembayaran menunggu transfer. Anda bisa menutup halaman ini dan mengecek status nanti.');
+        await fireAlert({ icon: "info", title: "Menunggu Transfer", text: "Pembayaran menunggu transfer. Anda bisa menutup halaman ini dan mengecek status nanti." });
         // Biarkan localStorage tetap ada agar banner pengingat nanti muncul
-        router.push({ path: '/', hash: '#harga' });
+        router.push({ path: "/", hash: "#harga" });
       },
       onError: (result) => {
         isSubmitting.value = false;
-        alert('Terjadi kesalahan pada proses pembayaran.');
+        fireAlert({ icon: "error", title: "Pembayaran Gagal", text: "Terjadi kesalahan pada proses pembayaran." });
       },
-      onClose: () => {
+      onClose: async () => {
         isSubmitting.value = false;
-        alert('Anda menutup halaman pembayaran. Anda dapat melanjutkannya nanti melalui beranda.');
+        await fireAlert({ icon: "info", title: "Pembayaran Ditutup", text: "Anda menutup halaman pembayaran. Anda dapat melanjutkannya nanti melalui beranda." });
         // Redirect user ke Beranda utama
-        router.push({ path: '/', hash: '#harga' });
+        router.push({ path: "/", hash: "#harga" });
       }
     });
 
   } catch (error) {
     isSubmitting.value = false;
-    alert(error.message || "Gagal menginisialisasi pendaftaran dan pembayaran.");
+    fireAlert({ icon: "error", title: "Gagal Memproses", text: error.message || "Gagal menginisialisasi pendaftaran dan pembayaran." });
   }
 };
 </script>
