@@ -22,7 +22,7 @@
         <form v-else class="space-y-5" @submit.prevent="submit">
           <div>
             <label class="mb-1.5 block text-sm font-bold text-slate-700">Course <span class="text-[#cf3d3d]">*</span></label>
-            <select v-model="form.course_id" :class="inputClass(errors.course_id)">
+            <select v-model="form.course_id" :class="formInputClass(errors.course_id)">
               <option value="" disabled>Pilih course</option>
               <option v-for="c in courses" :key="c.id" :value="c.id">{{ c.title }}</option>
             </select>
@@ -31,7 +31,7 @@
 
           <div>
             <label class="mb-1.5 block text-sm font-bold text-slate-700">Lesson (opsional)</label>
-            <select v-model="form.lesson_id" :disabled="!form.course_id" :class="inputClass(errors.lesson_id)">
+            <select v-model="form.lesson_id" :disabled="!form.course_id" :class="formInputClass(errors.lesson_id)">
               <option :value="null">Tanpa lesson</option>
               <option v-for="l in lessons" :key="l.id" :value="l.id">{{ l.title }}</option>
             </select>
@@ -41,7 +41,7 @@
           <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <label class="mb-1.5 block text-sm font-bold text-slate-700">Tipe Karakter <span class="text-[#cf3d3d]">*</span></label>
-              <select v-model="form.character_type" :class="inputClass(errors.character_type)">
+              <select v-model="form.character_type" :class="formInputClass(errors.character_type)">
                 <option value="" disabled>Pilih tipe</option>
                 <option value="hiragana">Hiragana</option>
                 <option value="katakana">Katakana</option>
@@ -51,7 +51,7 @@
             </div>
             <div>
               <label class="mb-1.5 block text-sm font-bold text-slate-700">Karakter <span class="text-[#cf3d3d]">*</span></label>
-              <input v-model="form.character" type="text" placeholder="cth. あ" :class="inputClass(errors.character)" />
+              <input v-model="form.character" type="text" placeholder="cth. あ" :class="formInputClass(errors.character)" />
               <p v-if="errors.character" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors.character[0] }}</p>
             </div>
           </div>
@@ -59,12 +59,12 @@
           <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <label class="mb-1.5 block text-sm font-bold text-slate-700">Jawaban <span class="text-[#cf3d3d]">*</span></label>
-              <input v-model="form.answer" type="text" placeholder="cth. a" :class="inputClass(errors.answer)" @input="syncAnswerToOptions" />
+              <input v-model="form.answer" type="text" placeholder="cth. a" :class="formInputClass(errors.answer)" @input="syncAnswerToOptions" />
               <p v-if="errors.answer" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors.answer[0] }}</p>
             </div>
             <div>
               <label class="mb-1.5 block text-sm font-bold text-slate-700">Hint (opsional)</label>
-              <input v-model="form.hint" type="text" placeholder="Petunjuk jawaban" :class="inputClass(errors.hint)" />
+              <input v-model="form.hint" type="text" placeholder="Petunjuk jawaban" :class="formInputClass(errors.hint)" />
               <p v-if="errors.hint" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors.hint[0] }}</p>
             </div>
           </div>
@@ -78,7 +78,7 @@
               <div v-for="(_, i) in form.options" :key="i">
                 <div class="flex items-center gap-2">
                   <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-bold text-slate-500">{{ String.fromCharCode(65 + i) }}</span>
-                  <input v-model="form.options[i]" type="text" :placeholder="`Opsi ${String.fromCharCode(65 + i)}`" :class="inputClass(optionsErrors[i])" />
+                  <input v-model="form.options[i]" type="text" :placeholder="`Opsi ${String.fromCharCode(65 + i)}`" :class="formInputClass(optionsErrors[i])" />
                 </div>
                 <p v-if="optionsErrors[i]" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ optionsErrors[i] }}</p>
               </div>
@@ -106,6 +106,7 @@ import { useTeacherToast } from '@/composables/useTeacherToast'
 import TeacherPageHeader from '@/components/teacher/ui/TeacherPageHeader.vue'
 import TeacherLoading from '@/components/teacher/ui/TeacherLoading.vue'
 import Button from '@/components/ui/Button.vue'
+import { formInputClass } from '@/lib/form'
 
 const route = useRoute()
 const router = useRouter()
@@ -132,11 +133,6 @@ const form = reactive({
   hint: '',
   is_active: true,
 })
-
-const inputClass = (err) => [
-  'w-full rounded-2xl border bg-white px-4 py-3 text-sm font-medium text-slate-800 placeholder:text-slate-400 transition focus:outline-none focus:ring-2 disabled:bg-slate-50 disabled:text-slate-400',
-  err ? 'border-[#cf3d3d] focus:border-[#cf3d3d] focus:ring-[#cf3d3d]/20' : 'border-slate-200 focus:border-[#cf3d3d] focus:ring-[#cf3d3d]/20',
-]
 
 const loadLessons = async (cid) => {
   if (!cid) { lessons.value = []; return }
@@ -238,8 +234,3 @@ onMounted(async () => {
   loading.value = false
 })
 </script>
-
-<style scoped>
-.animate-fadeIn { animation: fadeIn 0.35s ease-out forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-</style>

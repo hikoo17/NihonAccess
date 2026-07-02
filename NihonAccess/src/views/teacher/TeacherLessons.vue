@@ -8,8 +8,7 @@
     >
       <template #actions>
         <Button size="sm" @click="$router.push({ name: 'TeacherLessonCreate', params: { courseId } })">
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-          Tambah Lesson
+          <span v-html="iconPlus" /> Tambah Lesson
         </Button>
       </template>
     </TeacherPageHeader>
@@ -42,22 +41,18 @@
           <template #cell-actions="{ row }">
             <div class="flex items-center justify-end gap-1.5">
               <button @click="$router.push({ name: 'TeacherLessonEdit', params: { courseId, id: row.id } })" class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:border-[#cf3d3d]/40 hover:text-[#cf3d3d]" title="Edit">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                <span v-html="iconEdit" />
               </button>
               <button @click="askDelete(row)" class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:border-[#cf3d3d]/40 hover:bg-[#cf3d3d]/5 hover:text-[#cf3d3d]" title="Hapus">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                <span v-html="iconDelete" />
               </button>
             </div>
           </template>
         </TeacherDataTable>
 
-        <div v-if="confirmId" class="flex items-center justify-between gap-4 border-t border-slate-100 bg-[#cf3d3d]/5 px-6 py-4">
-          <p class="text-sm font-semibold text-slate-700">Hapus lesson "<span class="text-[#cf3d3d]">{{ confirmTitle }}</span>"?</p>
-          <div class="flex gap-2">
-            <Button variant="secondary" size="sm" @click="confirmId = null">Batal</Button>
-            <Button size="sm" :disabled="deleting" @click="confirmDelete">{{ deleting ? 'Menghapus...' : 'Ya, Hapus' }}</Button>
-          </div>
-        </div>
+        <TeacherConfirmBar :model-value="confirmId" :deleting="deleting" @cancel="confirmId = null" @confirm="confirmDelete">
+          <template #message>Hapus lesson "<span class="text-[#cf3d3d]">{{ confirmTitle }}</span>"?</template>
+        </TeacherConfirmBar>
       </template>
     </div>
   </div>
@@ -68,11 +63,13 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { teacherApi } from '@/services/teacherApi'
 import { useTeacherToast } from '@/composables/useTeacherToast'
+import { iconPlus, iconEdit, iconDelete } from '@/lib/teacherIcons'
 import TeacherPageHeader from '@/components/teacher/ui/TeacherPageHeader.vue'
 import TeacherDataTable from '@/components/teacher/ui/TeacherDataTable.vue'
 import TeacherLoading from '@/components/teacher/ui/TeacherLoading.vue'
 import TeacherEmptyState from '@/components/teacher/ui/TeacherEmptyState.vue'
 import TeacherStatusBadge from '@/components/teacher/ui/TeacherStatusBadge.vue'
+import TeacherConfirmBar from '@/components/teacher/ui/TeacherConfirmBar.vue'
 import Button from '@/components/ui/Button.vue'
 
 const route = useRoute()
@@ -127,8 +124,3 @@ const confirmDelete = async () => {
 
 onMounted(fetchLessons)
 </script>
-
-<style scoped>
-.animate-fadeIn { animation: fadeIn 0.35s ease-out forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-</style>

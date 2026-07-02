@@ -22,7 +22,7 @@
         <form v-else class="space-y-5" @submit.prevent="submit">
           <div>
             <label class="mb-1.5 block text-sm font-bold text-slate-700">Course <span class="text-[#cf3d3d]">*</span></label>
-            <select v-model="form.course_id" :class="inputClass(errors.course_id)" :disabled="isEdit">
+            <select v-model="form.course_id" :class="formInputClass(errors.course_id)" :disabled="isEdit">
               <option value="" disabled>Pilih course</option>
               <option v-for="c in courses" :key="c.id" :value="c.id">{{ c.title }}</option>
             </select>
@@ -31,7 +31,7 @@
 
           <div>
             <label class="mb-1.5 block text-sm font-bold text-slate-700">Lesson (opsional)</label>
-            <select v-model="form.lesson_id" :disabled="!form.course_id" :class="inputClass(errors.lesson_id)">
+            <select v-model="form.lesson_id" :disabled="!form.course_id" :class="formInputClass(errors.lesson_id)">
               <option :value="null">Tanpa lesson</option>
               <option v-for="l in lessons" :key="l.id" :value="l.id">{{ l.title }}</option>
             </select>
@@ -39,19 +39,19 @@
 
           <div>
             <label class="mb-1.5 block text-sm font-bold text-slate-700">Judul Quiz <span class="text-[#cf3d3d]">*</span></label>
-            <input v-model="form.title" type="text" placeholder="cth. Kuis Hiragana Dasar" :class="inputClass(errors.title)" />
+            <input v-model="form.title" type="text" placeholder="cth. Kuis Hiragana Dasar" :class="formInputClass(errors.title)" />
             <p v-if="errors.title" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors.title[0] }}</p>
           </div>
 
           <div>
             <label class="mb-1.5 block text-sm font-bold text-slate-700">Deskripsi</label>
-            <textarea v-model="form.description" rows="3" placeholder="Deskripsi singkat kuis..." :class="inputClass(errors.description)"></textarea>
+            <textarea v-model="form.description" rows="3" placeholder="Deskripsi singkat kuis..." :class="formInputClass(errors.description)"></textarea>
           </div>
 
           <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <label class="mb-1.5 block text-sm font-bold text-slate-700">Nilai Lulus (0-100)</label>
-              <input v-model.number="form.passing_score" type="number" min="0" max="100" :class="inputClass(errors.passing_score)" />
+              <input v-model.number="form.passing_score" type="number" min="0" max="100" :class="formInputClass(errors.passing_score)" />
               <p v-if="errors.passing_score" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors.passing_score[0] }}</p>
             </div>
             <div class="flex items-end">
@@ -105,13 +105,13 @@
             <div class="space-y-4">
               <div>
                 <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Pertanyaan</label>
-                <textarea v-model="q.question" rows="2" placeholder="Tulis pertanyaan..." :class="inputClass(errors[`questions.${idx}.question`])"></textarea>
+                <textarea v-model="q.question" rows="2" placeholder="Tulis pertanyaan..." :class="formInputClass(errors[`questions.${idx}.question`])"></textarea>
                 <p v-if="errors[`questions.${idx}.question`]" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors[`questions.${idx}.question`][0] }}</p>
               </div>
 
               <div>
                 <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Opsi Jawaban (satu per baris)</label>
-                <textarea v-model="q.optionsText" rows="3" placeholder="Opsi A&#10;Opsi B&#10;Opsi C&#10;Opsi D" :class="inputClass(errors[`questions.${idx}.options`])"></textarea>
+                <textarea v-model="q.optionsText" rows="3" placeholder="Opsi A&#10;Opsi B&#10;Opsi C&#10;Opsi D" :class="formInputClass(errors[`questions.${idx}.options`])"></textarea>
                 <p class="mt-1 text-xs font-medium text-slate-400">Pisahkan tiap opsi dengan baris baru.</p>
                 <p v-if="errors[`questions.${idx}.options`]" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors[`questions.${idx}.options`][0] }}</p>
               </div>
@@ -119,12 +119,12 @@
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Jawaban Benar</label>
-                  <input v-model="q.correct_answer" type="text" placeholder="Harus sama persis dengan salah satu opsi" :class="inputClass(errors[`questions.${idx}.correct_answer`])" />
+                  <input v-model="q.correct_answer" type="text" placeholder="Harus sama persis dengan salah satu opsi" :class="formInputClass(errors[`questions.${idx}.correct_answer`])" />
                   <p v-if="errors[`questions.${idx}.correct_answer`]" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors[`questions.${idx}.correct_answer`][0] }}</p>
                 </div>
                 <div>
                   <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Penjelasan (opsional)</label>
-                  <input v-model="q.explanation" type="text" placeholder="Alasan jawaban benar" :class="inputClass()" />
+                  <input v-model="q.explanation" type="text" placeholder="Alasan jawaban benar" :class="formInputClass()" />
                 </div>
               </div>
             </div>
@@ -153,6 +153,7 @@ import { useAiGeneration } from '@/composables/useAiGeneration'
 import TeacherPageHeader from '@/components/teacher/ui/TeacherPageHeader.vue'
 import TeacherLoading from '@/components/teacher/ui/TeacherLoading.vue'
 import Button from '@/components/ui/Button.vue'
+import { formInputClass } from '@/lib/form'
 
 const route = useRoute()
 const router = useRouter()
@@ -179,11 +180,6 @@ const form = reactive({
   is_active: true,
   questions: [],
 })
-
-const inputClass = (err) => [
-  'w-full rounded-2xl border bg-white px-4 py-3 text-sm font-medium text-slate-800 placeholder:text-slate-400 transition focus:outline-none focus:ring-2 disabled:bg-slate-50 disabled:text-slate-400',
-  err ? 'border-[#cf3d3d] focus:border-[#cf3d3d] focus:ring-[#cf3d3d]/20' : 'border-slate-200 focus:border-[#cf3d3d] focus:ring-[#cf3d3d]/20',
-]
 
 const addQuestion = () => {
   form.questions.push(blankQuestion())
@@ -297,8 +293,3 @@ onMounted(async () => {
   loading.value = false
 })
 </script>
-
-<style scoped>
-.animate-fadeIn { animation: fadeIn 0.35s ease-out forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-</style>

@@ -22,20 +22,20 @@
         <form v-else class="space-y-5" @submit.prevent="submit">
           <div>
             <label class="mb-1.5 block text-sm font-bold text-slate-700">Judul Course <span class="text-[#cf3d3d]">*</span></label>
-            <input v-model="form.title" type="text" placeholder="cth. JLPT N5 Fundamental" :class="inputClass(errors.title)" />
+            <input v-model="form.title" type="text" placeholder="cth. JLPT N5 Fundamental" :class="formInputClass(errors.title)" />
             <p v-if="errors.title" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors.title[0] }}</p>
           </div>
 
           <div>
             <label class="mb-1.5 block text-sm font-bold text-slate-700">Deskripsi</label>
-            <textarea v-model="form.description" rows="4" placeholder="Deskripsi singkat course..." :class="inputClass(errors.description)"></textarea>
+            <textarea v-model="form.description" rows="4" placeholder="Deskripsi singkat course..." :class="formInputClass(errors.description)"></textarea>
             <p v-if="errors.description" class="mt-1 text-xs font-semibold text-[#cf3d3d]">{{ errors.description[0] }}</p>
           </div>
 
           <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <label class="mb-1.5 block text-sm font-bold text-slate-700">Level</label>
-              <select v-model="form.level" :class="inputClass(errors.level)">
+              <select v-model="form.level" :class="formInputClass(errors.level)">
                 <option value="">Tanpa level</option>
                 <option value="Pemula">Pemula</option>
                 <option value="N5">N5</option>
@@ -90,6 +90,7 @@ import { useTeacherToast } from '@/composables/useTeacherToast'
 import TeacherPageHeader from '@/components/teacher/ui/TeacherPageHeader.vue'
 import TeacherLoading from '@/components/teacher/ui/TeacherLoading.vue'
 import Button from '@/components/ui/Button.vue'
+import { formInputClass } from '@/lib/form'
 
 const route = useRoute()
 const router = useRouter()
@@ -113,11 +114,6 @@ const form = reactive({
   level: '',
   is_active: true,
 })
-
-const inputClass = (err) => [
-  'w-full rounded-2xl border bg-white px-4 py-3 text-sm font-medium text-slate-800 placeholder:text-slate-400 transition focus:outline-none focus:ring-2',
-  err ? 'border-[#cf3d3d] focus:border-[#cf3d3d] focus:ring-[#cf3d3d]/20' : 'border-slate-200 focus:border-[#cf3d3d] focus:ring-[#cf3d3d]/20',
-]
 
 const MAX_SIZE = 2 * 1024 * 1024
 const ALLOWED = ['image/jpeg', 'image/png', 'image/webp']
@@ -197,8 +193,3 @@ onUnmounted(() => {
   if (createdObjectUrl) URL.revokeObjectURL(createdObjectUrl)
 })
 </script>
-
-<style scoped>
-.animate-fadeIn { animation: fadeIn 0.35s ease-out forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-</style>
