@@ -1,8 +1,9 @@
 <template>
   <header class="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-100 bg-white/80 px-6 backdrop-blur-md sm:px-8">
-    <!-- Left: title (toggle sudah pindah ke sidebar) -->
+    <!-- Left: logo (mobile) / page title (desktop) -->
     <div class="flex items-center gap-3">
-      <h2 class="text-base font-extrabold text-slate-800">{{ pageTitle }}</h2>
+      <img src="/logo.png" alt="Nihon Access" class="h-7 w-auto lg:hidden" />
+      <h2 class="hidden text-base font-extrabold text-slate-800 lg:block">{{ pageTitle }}</h2>
     </div>
 
     <!-- Right: notif + profile -->

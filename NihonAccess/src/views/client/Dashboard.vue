@@ -1,17 +1,29 @@
 <template>
   <div class="mx-auto max-w-6xl space-y-8">
-    <div>
-      <Breadcrumb :items="[{ label: 'Dashboard' }]" />
-      <h1
-        class="mt-3 text-2xl font-extrabold tracking-tight text-slate-800 sm:text-3xl"
-      >
-        Selamat datang kembali,
-        <span class="text-[#cf3d3d]">{{ loading ? '...' : (userName || 'Pengguna') }}</span>
-        <span class="wave-emoji">👋</span>
-      </h1>
-      <p class="mt-1 text-sm text-slate-500">
-        Lanjutkan belajar dan capai targetmu hari ini.
-      </p>
+    <!-- Welcome -->
+    <div class="flex items-center justify-between gap-4">
+      <div class="min-w-0">
+        <Breadcrumb :items="[{ label: 'Dashboard' }]" />
+        <h1
+          class="mt-3 text-xl font-extrabold tracking-tight text-slate-800 sm:text-2xl lg:text-3xl"
+        >
+          Selamat datang kembali,
+          <span class="text-[#cf3d3d]">{{ loading ? '...' : (userName || 'Pengguna') }}</span>
+          <span class="wave-emoji">👋</span>
+        </h1>
+        <p class="mt-1 text-sm text-slate-500">
+          Lanjutkan belajar dan capai targetmu hari ini.
+        </p>
+      </div>
+
+      <!-- Ilustrasi dekoratif bertema pembelajaran (mobile only) -->
+      <div class="shrink-0 lg:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-14 w-14 sm:h-16 sm:w-16" aria-hidden="true">
+          <circle cx="12" cy="12" r="12" fill="#cf3d3d" fill-opacity="0.08" />
+          <path fill="#cf3d3d" d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3z" />
+          <path fill="#b03333" d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z" />
+        </svg>
+      </div>
     </div>
 
     <!-- Error banner -->
@@ -22,38 +34,37 @@
       Gagal memuat data dashboard: {{ error }}
     </div>
 
-    <!-- Stat cards -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <!-- Stat cards (mobile 2x2, desktop 1x4) -->
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
       <StatCard
         label="Kursus Aktif"
         :value="loading ? '...' : stats.active_courses"
         :subtitle="loading ? '' : `${stats.active_courses} sedang berjalan`"
         :icon="iconKursusAktif"
-        iconBg="white"
+        to="/client/my-courses"
       />
       <StatCard
         label="Progress Belajar"
         :value="loading ? '...' : `${stats.progress_percent}%`"
         subtitle="Kerja bagus!"
         :icon="iconRocket"
-        iconBg=""
         iconColor="text-emerald-600"
+        to="/client/my-courses"
       />
       <StatCard
         label="Pelajaran Selesai"
         :value="loading ? '...' : stats.completed_lessons"
         :subtitle="loading ? '' : `dari ${stats.total_lessons} pelajaran`"
         :icon="iconTarget"
-        iconBg=""
         iconColor="text-blue-600"
+        to="/client/my-courses"
       />
       <StatCard
         label="Hari Aktif"
         :value="loading ? '...' : stats.active_days"
         subtitle="bulan ini"
         :icon="iconStreak"
-        iconBg=""
-        iconColor=""
+        to="/client/dashboard"
       />
     </div>
 
@@ -127,7 +138,7 @@
                 <Badge variant="success" size="sm" dot>Aktif</Badge>
               </div>
               <p class="mt-0.5 text-xs text-slate-400">
-                Lesson {{ course.lesson }} dari {{ course.totalLessons }}
+                {{ course.lesson }} materi dari {{ course.totalLessons }}
               </p>
               <div class="mt-3">
                 <ProgressBar
@@ -160,10 +171,7 @@ import ProgressBar from "@/components/ui/ProgresBar.vue";
 import StatCard from "@/components/Client/StatCard.vue";
 import { clientApi } from "@/services/clientApi";
 
-// Ikon SVG
-const iconBook = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>`;
-const iconChart = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>`;
-const iconCheck = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+// Ikon SVG / emoji
 const iconStreak = `<img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="streak" class="h-9 w-9 animate-pulse" />`;
 const iconTarget = `<img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3af/512.gif" alt="target" class="h-9 w-9" />`;
 const iconKursusAktif = `<img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f393/512.gif" alt="graduation cap" class="h-9 w-9" />`;
