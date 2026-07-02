@@ -2,7 +2,7 @@
 <template>
   <div 
     :class="[
-      'p-6 rounded-[2rem] shadow-sm flex flex-col justify-between relative min-h-[150px] transition-all border',
+      'p-5 sm:p-6 rounded-[2rem] shadow-sm flex flex-col justify-between relative min-h-[150px] transition-all border',
       isPrimary 
         ? 'bg-[#cf3d3d] text-white border-transparent shadow-[#cf3d3d]/20 shadow-lg' 
         : 'bg-white border-slate-100 text-slate-800'

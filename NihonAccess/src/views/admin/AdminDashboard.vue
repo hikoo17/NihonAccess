@@ -2,7 +2,7 @@
   <div class="mx-auto max-w-7xl space-y-6 animate-fadeIn">
     <div v-if="isLoading" class="space-y-6">
       <!-- Stat cards skeleton -->
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+      <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
         <SkeletonStatCard v-for="n in 4" :key="`sk-stat-${n}`" />
       </div>
 
@@ -21,7 +21,7 @@
       </div>
 
       <!-- Summary cards skeleton -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <div v-for="n in 3" :key="`sk-sum-${n}`" class="rounded-[2rem] border border-slate-100 bg-white shadow-sm p-6">
           <Skeleton width="45%" height="0.875rem" />
           <div class="mt-5 space-y-4">
@@ -52,7 +52,7 @@
     </div>
 
     <template v-else>
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+      <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
         <AdminStatCard :label="stats[0]?.label" :value="stats[0]?.value">
           <template #icon>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5">
@@ -136,7 +136,7 @@
       </div>
 
       <!-- Summary Cards Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <!-- User Summary -->
         <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6">
           <h3 class="text-sm font-bold text-slate-800 mb-5">Ringkasan User</h3>
