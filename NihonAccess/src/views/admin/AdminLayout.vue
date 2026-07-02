@@ -1,23 +1,20 @@
 <template>
   <div class="min-h-screen bg-slate-50/50 font-sans text-slate-900 antialiased">
-    <!-- Sidebar -->
-    <AdminSidebar :is-collapsed="isCollapsed" @toggle="toggleSidebar" @navigate="onNavigate" />
-
-    <!-- Backdrop (mobile only, saat melebar) -->
-    <div
-      v-if="!isCollapsed"
-      class="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-sm lg:hidden"
-      @click="isCollapsed = true"
+    <!-- Sidebar (desktop only) -->
+    <AdminSidebar
+      class="hidden lg:block"
+      :is-collapsed="isCollapsed"
+      @toggle="toggleSidebar"
     />
 
-    <!-- Konten utama: padding kiri dinamis -->
+    <!-- Konten utama: padding kiri hanya di desktop -->
     <div
-      class="transition-all duration-300 ease-in-out pl-20"
+      class="transition-all duration-300 ease-in-out"
       :class="isCollapsed ? 'lg:pl-20' : 'lg:pl-64'"
     >
       <AdminTopbar />
 
-      <main class="px-6 py-8 sm:px-8 lg:px-10">
+      <main class="px-6 pt-8 pb-28 sm:px-8 lg:px-10 lg:pb-8">
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
@@ -25,45 +22,24 @@
         </router-view>
       </main>
     </div>
+
+    <!-- Bottom navigation (mobile only) -->
+    <AdminBottomNav class="lg:hidden" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import AdminSidebar from '@/components/admin/AdminSidebar.vue'
 import AdminTopbar from '@/components/admin/AdminTopbar.vue'
+import AdminBottomNav from '@/components/admin/AdminBottomNav.vue'
 
-const DESKTOP_BREAKPOINT = 1024
-
-// isCollapsed: true = menyempit (logo+ikon), false = melebar (full)
+// Hanya relevan di desktop (mobile pakai bottom nav)
 const isCollapsed = ref(false)
 
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value
 }
-
-// Klik menu di mobile → otomatis menyempit balik
-const onNavigate = () => {
-  if (typeof window !== 'undefined' && window.innerWidth < DESKTOP_BREAKPOINT) {
-    isCollapsed.value = true
-  }
-}
-
-const handleResize = () => {
-  if (window.innerWidth < DESKTOP_BREAKPOINT) {
-    isCollapsed.value = true
-  }
-}
-
-onMounted(() => {
-  // Default: melebar di desktop, menyempit di mobile
-  isCollapsed.value = window.innerWidth < DESKTOP_BREAKPOINT
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-})
 </script>
 
 <style scoped>
