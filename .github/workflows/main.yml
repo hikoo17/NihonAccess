@@ -22,24 +22,45 @@ jobs:
           script: |
             set -e
 
-            cd ${{ secrets.VPS_PROJECT_PATH }}
+            PROJECT_PATH="${{ secrets.VPS_PROJECT_PATH }}"
+            PHP_BIN="/usr/local/lsws/lsphp83/bin/php"
+            COMPOSER_BIN="$(which composer)"
+
+            cd "$PROJECT_PATH"
 
             echo "===> Pull latest code"
             git fetch origin
             git reset --hard origin/Second
 
-            echo "===> Sync Laravel server files"
-            rsync -a --delete server/ ./
-
-            echo "===> Ensure public directory exists"
-            mkdir -p public
-
-            echo "===> Sync frontend files"
-            rsync -a --delete NihonAccess/ public/
+            echo "===> Install Composer dependencies"
+            $PHP_BIN $COMPOSER_BIN install \
+              --no-dev \
+              --prefer-dist \
+              --no-interaction \
+              --optimize-autoloader
 
             echo "===> Build frontend"
             cd public
-            npm install
+
+            npm ci
             npm run build
+
+            cd ..
+
+            echo "===> Run database migration"
+            $PHP_BIN artisan migrate --force
+
+            echo "===> Optimize Laravel"
+            $PHP_BIN artisan config:clear
+            $PHP_BIN artisan cache:clear
+            $PHP_BIN artisan route:clear
+            $PHP_BIN artisan view:clear
+
+            $PHP_BIN artisan config:cache
+            $PHP_BIN artisan route:cache
+            $PHP_BIN artisan view:cache
+
+            echo "===> Set permissions"
+            chmod -R ug+rw storage bootstrap/cache
 
             echo "===> Deployment completed"
