@@ -1,23 +1,21 @@
 <template>
   <div class="min-h-screen bg-slate-50/50 font-sans text-slate-900 antialiased">
-    <!-- Sidebar -->
-    <TeacherSidebar :is-collapsed="isCollapsed" @toggle="toggleSidebar" @navigate="onNavigate" />
-
-    <!-- Backdrop (mobile only, saat melebar) -->
-    <div
-      v-if="!isCollapsed"
-      class="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-sm lg:hidden"
-      @click="isCollapsed = true"
+    <!-- Sidebar (desktop only) -->
+    <TeacherSidebar
+      class="hidden lg:block"
+      :is-collapsed="isCollapsed"
+      @toggle="toggleSidebar"
     />
 
-    <!-- Konten utama: padding kiri dinamis -->
+    <!-- Konten utama: padding kiri hanya di desktop -->
     <div
-      class="transition-all duration-300 ease-in-out pl-20"
+      class="transition-all duration-300 ease-in-out"
       :class="isCollapsed ? 'lg:pl-20' : 'lg:pl-64'"
     >
       <TeacherTopbar />
 
-      <main class="px-6 py-8 sm:px-8 lg:px-10">
+      <!-- pb-28 untuk akomodasi bottom nav di mobile -->
+      <main class="px-6 pt-8 pb-28 sm:px-8 lg:px-10 lg:pb-8">
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
@@ -26,56 +24,26 @@
       </main>
     </div>
 
+    <!-- Bottom navigation (mobile only) -->
+    <TeacherBottomNav class="lg:hidden" />
     <TeacherToast />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import TeacherSidebar from '@/components/teacher/TeacherSidebar.vue'
 import TeacherTopbar from '@/components/teacher/TeacherTopbar.vue'
+import TeacherBottomNav from '@/components/teacher/TeacherBottomNav.vue'
 import TeacherToast from '@/components/teacher/TeacherToast.vue'
 
-const DESKTOP_BREAKPOINT = 1024
-
-// isCollapsed: true = menyempit (logo+ikon), false = melebar (full)
 const isCollapsed = ref(false)
-
-const toggleSidebar = () => {
-  isCollapsed.value = !isCollapsed.value
-}
-
-// Klik menu di mobile → otomatis menyempit balik
-const onNavigate = () => {
-  if (typeof window !== 'undefined' && window.innerWidth < DESKTOP_BREAKPOINT) {
-    isCollapsed.value = true
-  }
-}
-
-const handleResize = () => {
-  if (window.innerWidth < DESKTOP_BREAKPOINT) {
-    isCollapsed.value = true
-  }
-}
-
-onMounted(() => {
-  // Default: melebar di desktop, menyempit di mobile
-  isCollapsed.value = window.innerWidth < DESKTOP_BREAKPOINT
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-})
+const toggleSidebar = () => { isCollapsed.value = !isCollapsed.value }
 </script>
 
 <style scoped>
 .fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
+.fade-leave-active { transition: opacity 0.2s ease; }
 .fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+.fade-leave-to { opacity: 0; }
 </style>

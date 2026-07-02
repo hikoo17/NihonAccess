@@ -60,6 +60,12 @@ export const teacherApi = {
     get: (id) => request(`/courses/${id}`),
     create: (form) => request('/courses', { method: 'POST', form }),
     update: (id, form) => request(`/courses/${id}`, { method: 'POST', form }),
+    toggleActive: (id, active) => {
+      const form = new FormData()
+      form.append('_method', 'PUT')
+      form.append('is_active', active ? 1 : 0)
+      return request(`/courses/${id}`, { method: 'POST', form })
+    },
     remove: (id) => request(`/courses/${id}`, { method: 'DELETE' }),
   },
 
@@ -75,6 +81,7 @@ export const teacherApi = {
     get: (id) => request(`/quizzes/${id}`),
     create: (body) => request('/quizzes', { method: 'POST', body }),
     update: (id, body) => request(`/quizzes/${id}`, { method: 'PUT', body }),
+    toggleActive: (id, active) => request(`/quizzes/${id}`, { method: 'PUT', body: { is_active: active } }),
     remove: (id) => request(`/quizzes/${id}`, { method: 'DELETE' }),
   },
 
@@ -91,6 +98,7 @@ export const teacherApi = {
     get: (id) => request(`/listening-exercises/${id}`),
     create: (body) => request('/listening-exercises', { method: 'POST', body }),
     update: (id, body) => request(`/listening-exercises/${id}`, { method: 'PUT', body }),
+    toggleActive: (id, active) => request(`/listening-exercises/${id}`, { method: 'PUT', body: { is_active: active } }),
     remove: (id) => request(`/listening-exercises/${id}`, { method: 'DELETE' }),
   },
 

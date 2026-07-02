@@ -17,6 +17,24 @@ export function useTeacherList({ api, label, labelKey = 'title', queryFor }) {
   const confirmLabel = ref('')
   const deleting = ref(false)
 
+  const togglingId = ref(null)
+
+  const toggleActive = async (row) => {
+    if (togglingId.value || !api.toggleActive) return
+    togglingId.value = row.id
+    const newState = !row.is_active
+    row.is_active = newState
+    try {
+      await api.toggleActive(row.id, newState)
+      success(`${label} ${newState ? 'diaktifkan' : 'dinonaktifkan'}.`)
+    } catch (e) {
+      row.is_active = !newState
+      error(e.message || `Gagal mengubah status ${label.toLowerCase()}.`)
+    } finally {
+      togglingId.value = null
+    }
+  }
+
   const fetchItems = async () => {
     loading.value = true
     try {
@@ -60,6 +78,7 @@ export function useTeacherList({ api, label, labelKey = 'title', queryFor }) {
     success, error,
     loading, items, meta, page,
     confirmId, confirmLabel, deleting,
+    togglingId, toggleActive,
     fetchItems, onPage, askDelete, cancelDelete, confirmDelete,
   }
 }

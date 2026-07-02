@@ -1,5 +1,6 @@
 <template>
-  <div class="overflow-x-auto">
+  <!-- DESKTOP: tabel (md ke atas) -->
+  <div class="hidden overflow-x-auto md:block">
     <table class="w-full text-left border-collapse">
       <thead>
         <tr class="border-b border-slate-200">
@@ -35,6 +36,11 @@
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- MOBILE: kartu (di bawah md) -->
+  <div v-if="$slots.mobile" class="divide-y divide-slate-100 md:hidden">
+    <slot name="mobile" :items="items" />
   </div>
 </template>
 

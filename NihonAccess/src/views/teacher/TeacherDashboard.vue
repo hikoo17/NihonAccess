@@ -6,7 +6,7 @@
       <p class="mt-1 text-sm text-slate-500">Ringkasan aktivitas mengajar Anda hari ini.</p>
     </div>
 
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
       <TeacherStatCard
         v-for="(stat, index) in stats"
         :key="index"

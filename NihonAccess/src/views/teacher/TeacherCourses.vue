@@ -7,12 +7,12 @@
     >
       <template #actions>
         <div class="relative">
-          <input
-            v-model="search"
-            type="text"
-            placeholder="Cari course..."
-            class="h-10 w-56 rounded-2xl border border-slate-200 bg-white pl-9 pr-3 text-sm font-medium text-slate-700 placeholder:text-slate-400 transition focus:border-[#cf3d3d] focus:outline-none focus:ring-2 focus:ring-[#cf3d3d]/20"
-          />
+<input
+  v-model="search"
+  type="text"
+  placeholder="Cari course..."
+  class="h-10 w-full rounded-2xl border border-slate-200 bg-white pl-9 pr-3 text-sm font-medium text-slate-700 placeholder:text-slate-400 transition focus:border-[#cf3d3d] focus:outline-none focus:ring-2 focus:ring-[#cf3d3d]/20 sm:w-56"
+/>
           <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
         </div>
         <Button size="sm" @click="$router.push({ name: 'TeacherCourseCreate' })">

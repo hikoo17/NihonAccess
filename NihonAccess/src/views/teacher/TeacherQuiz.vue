@@ -2,8 +2,8 @@
   <div class="animate-fadeIn">
     <TeacherPageHeader eyebrow="Quiz & Soal" title="Quiz & Soal" subtitle="Kelola kuis beserta daftar soal pilihan ganda.">
       <template #actions>
-        <div class="relative">
-          <input v-model="search" type="text" placeholder="Cari quiz..." class="h-10 w-48 rounded-2xl border border-slate-200 bg-white pl-9 pr-3 text-sm font-medium text-slate-700 placeholder:text-slate-400 transition focus:border-[#cf3d3d] focus:outline-none focus:ring-2 focus:ring-[#cf3d3d]/20" />
+        <div class="relative w-full sm:w-48">
+          <input v-model="search" type="text" placeholder="Cari quiz..." class="h-10 w-full rounded-2xl border border-slate-200 bg-white pl-9 pr-3 text-sm font-medium text-slate-700 placeholder:text-slate-400 transition focus:border-[#cf3d3d] focus:outline-none focus:ring-2 focus:ring-[#cf3d3d]/20" />
           <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" v-html="iconSearch" />
         </div>
         <Button size="sm" @click="$router.push({ name: 'TeacherQuizCreate' })">
@@ -25,6 +25,7 @@
 
       <template v-else>
         <TeacherDataTable :items="items" :columns="columns">
+          <!-- sel desktop -->
           <template #cell-title="{ row }">
             <span class="font-bold text-slate-800">{{ row.title }}</span>
             <p v-if="row.description" class="mt-0.5 line-clamp-1 text-xs font-medium text-slate-400">{{ row.description }}</p>
@@ -44,6 +45,31 @@
               <button @click="askDelete(row)" class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:border-[#cf3d3d]/40 hover:bg-[#cf3d3d]/5 hover:text-[#cf3d3d]" title="Hapus">
                 <span v-html="iconDelete" />
               </button>
+            </div>
+          </template>
+
+          <!-- kartu mobile -->
+          <template #mobile="{ items }">
+            <div v-for="row in items" :key="row.id" class="p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0 flex-1">
+                  <span class="font-bold text-slate-800">{{ row.title }}</span>
+                  <p v-if="row.description" class="mt-0.5 line-clamp-1 text-xs font-medium text-slate-400">{{ row.description }}</p>
+                  <p class="mt-1 text-xs font-medium text-slate-500">{{ row.course?.title || '-' }}</p>
+                  <div class="mt-2 flex flex-wrap items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-600">{{ row.questions?.length || 0 }} soal</span>
+                    <TeacherStatusBadge :active="row.is_active" />
+                  </div>
+                </div>
+                <div class="flex shrink-0 gap-1.5">
+                  <button @click="$router.push({ name: 'TeacherQuizEdit', params: { id: row.id } })" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition-colors hover:border-[#cf3d3d]/40 hover:text-[#cf3d3d]" title="Edit">
+                    <span v-html="iconEdit" />
+                  </button>
+                  <button @click="askDelete(row)" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition-colors hover:border-[#cf3d3d]/40 hover:bg-[#cf3d3d]/5 hover:text-[#cf3d3d]" title="Hapus">
+                    <span v-html="iconDelete" />
+                  </button>
+                </div>
+              </div>
             </div>
           </template>
         </TeacherDataTable>
@@ -68,13 +94,14 @@ import TeacherDataTable from '@/components/teacher/ui/TeacherDataTable.vue'
 import TeacherLoading from '@/components/teacher/ui/TeacherLoading.vue'
 import TeacherEmptyState from '@/components/teacher/ui/TeacherEmptyState.vue'
 import TeacherStatusBadge from '@/components/teacher/ui/TeacherStatusBadge.vue'
+import TeacherToggle from '@/components/teacher/ui/TeacherToggle.vue'
 import TeacherPagination from '@/components/teacher/ui/TeacherPagination.vue'
 import TeacherConfirmBar from '@/components/teacher/ui/TeacherConfirmBar.vue'
 import Button from '@/components/ui/Button.vue'
 
 const search = ref('')
 
-const { loading, items, meta, page, confirmId, confirmLabel, deleting, fetchItems, onPage, askDelete, cancelDelete, confirmDelete } = useTeacherList({
+const { loading, items, meta, page, confirmId, confirmLabel, deleting, togglingId, toggleActive, fetchItems, onPage, askDelete, cancelDelete, confirmDelete } = useTeacherList({
   api: teacherApi.quizzes,
   label: 'Quiz',
   queryFor: () => (search.value ? { search: search.value } : {}),
@@ -96,3 +123,8 @@ watch(search, () => {
 
 onMounted(fetchItems)
 </script>
+
+<style scoped>
+.animate-fadeIn { animation: fadeIn 0.35s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+</style>

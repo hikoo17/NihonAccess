@@ -48,6 +48,30 @@
               </button>
             </div>
           </template>
+
+          <!-- kartu mobile -->
+          <template #mobile="{ items }">
+            <div v-for="row in items" :key="row.id" class="p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0 flex-1">
+                  <span class="font-bold text-slate-800">{{ row.title }}</span>
+                  <p v-if="row.slug" class="text-xs font-medium text-slate-400">/{{ row.slug }}</p>
+                  <div class="mt-2 flex flex-wrap items-center gap-1.5">
+                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-600">Urutan #{{ row.sort_order ?? 0 }}</span>
+                    <TeacherStatusBadge :active="row.is_active" />
+                  </div>
+                </div>
+                <div class="flex shrink-0 gap-1.5">
+                  <button @click="$router.push({ name: 'TeacherLessonEdit', params: { courseId, id: row.id } })" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition-colors hover:border-[#cf3d3d]/40 hover:text-[#cf3d3d]" title="Edit">
+                    <span v-html="iconEdit" />
+                  </button>
+                  <button @click="askDelete(row)" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition-colors hover:border-[#cf3d3d]/40 hover:bg-[#cf3d3d]/5 hover:text-[#cf3d3d]" title="Hapus">
+                    <span v-html="iconDelete" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </template>
         </TeacherDataTable>
 
         <TeacherConfirmBar :model-value="confirmId" :deleting="deleting" @cancel="confirmId = null" @confirm="confirmDelete">
@@ -124,3 +148,8 @@ const confirmDelete = async () => {
 
 onMounted(fetchLessons)
 </script>
+
+<style scoped>
+.animate-fadeIn { animation: fadeIn 0.35s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+</style>
