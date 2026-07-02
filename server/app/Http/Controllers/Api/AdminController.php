@@ -233,9 +233,31 @@ class AdminController extends Controller
             'is_active' => ['boolean'],
             'features' => ['nullable', 'array'],
             'features.*' => ['string', 'max:255'],
+            'highlights' => ['nullable', 'array'],
+            'highlights.*.label' => ['required', 'string', 'max:120'],
+            'highlights.*.value' => ['required', 'string', 'max:120'],
+            'modules' => ['nullable', 'array'],
+            'modules.*.name' => ['required', 'string', 'max:160'],
+            'modules.*.description' => ['nullable', 'string', 'max:500'],
+            'suitable_for' => ['nullable', 'array'],
+            'suitable_for.*' => ['string', 'max:300'],
         ], [
             'slug.regex' => 'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung.',
         ]);
+
+        $typeDefaults = [
+            'online' => [
+                'badge' => 'Online Course',
+                'format' => 'Belajar Daring',
+                'price_note' => 'Akses pembelajaran sepenuhnya online',
+            ],
+            'onsite' => [
+                'badge' => 'Kelas Tatap Muka',
+                'format' => 'Belajar Luring',
+                'price_note' => 'Termasuk sesi belajar langsung di lokasi',
+            ],
+        ];
+        $defaults = $typeDefaults[$validated['type']] ?? ['badge' => null, 'format' => null, 'price_note' => null];
 
         $slug = $validated['slug'] ?? Str::slug($validated['name']);
         $original = $slug;
@@ -249,10 +271,16 @@ class AdminController extends Controller
             'slug' => $slug,
             'type' => $validated['type'],
             'icon' => $validated['icon'] ?? null,
+            'badge' => $defaults['badge'],
+            'format' => $defaults['format'],
             'level' => $validated['level'] ?? null,
             'description' => $validated['description'] ?? null,
             'price' => $validated['price'],
+            'price_note' => $defaults['price_note'],
             'duration_days' => $validated['duration_days'],
+            'highlights' => $validated['highlights'] ?? null,
+            'modules' => $validated['modules'] ?? null,
+            'suitable_for' => $validated['suitable_for'] ?? null,
             'is_active' => $validated['is_active'] ?? true,
         ]);
 
@@ -277,12 +305,18 @@ class AdminController extends Controller
                 'slug' => $package->slug,
                 'type' => $package->type,
                 'icon' => $package->icon,
+                'badge' => $package->badge,
+                'format' => $package->format,
                 'level' => $package->level,
                 'description' => $package->description,
                 'price' => $package->price,
                 'price_formatted' => $package->price_formatted,
+                'price_note' => $package->price_note,
                 'duration_days' => $package->duration_days,
                 'duration_label' => $package->duration_label,
+                'highlights' => $package->highlights,
+                'modules' => $package->modules,
+                'suitable_for' => $package->suitable_for,
                 'is_active' => $package->is_active,
                 'features' => $package->features()->orderBy('sort_order')->get()->map(fn ($f) => [
                     'id' => $f->id,

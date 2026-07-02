@@ -164,6 +164,27 @@
               </div>
             </div>
 
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div class="mb-2 flex items-center gap-2">
+                <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#cf3d3d]/10 text-[#cf3d3d] text-xs font-bold">i</span>
+                <p class="text-xs font-bold text-slate-600">Detail otomatis sesuai tipe paket</p>
+              </div>
+              <div class="space-y-1.5 text-xs text-slate-500">
+                <div class="flex items-start gap-2">
+                  <span class="w-20 shrink-0 font-bold text-slate-400">Badge</span>
+                  <span class="rounded-full bg-[#cf3d3d]/10 px-2.5 py-1 font-bold text-[#cf3d3d]">{{ typeDefaults.badge }}</span>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="w-20 shrink-0 font-bold text-slate-400">Format</span>
+                  <span class="rounded-full bg-slate-200 px-2.5 py-1 font-bold text-slate-600">{{ typeDefaults.format }}</span>
+                </div>
+                <div class="flex items-start gap-2">
+                  <span class="w-20 shrink-0 font-bold text-slate-400">Catatan</span>
+                  <span>{{ typeDefaults.price_note }}</span>
+                </div>
+              </div>
+            </div>
+
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label>Harga (Rp)</Label>
@@ -218,6 +239,118 @@
               </div>
             </div>
 
+            <!-- Highlights (card statistik di atas halaman detail) -->
+            <div>
+              <div class="mb-2 flex items-center justify-between">
+                <Label class="mb-0">Highlight Paket</Label>
+                <button type="button" @click="addHighlight" class="inline-flex items-center gap-1 text-xs font-bold text-[#cf3d3d] hover:text-[#b83232]">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Tambah
+                </button>
+              </div>
+              <p class="mb-2 text-[11px] text-slate-400">Tampil sebagai card kecil di bagian atas halaman detail (disarankan 3).</p>
+              <div v-if="!form.highlights.length" class="rounded-2xl border border-dashed border-slate-200 px-4 py-3 text-xs text-slate-400">
+                Belum ada highlight. Klik "Tambah" untuk menambahkan.
+              </div>
+              <div v-else class="space-y-2">
+                <div v-for="(h, idx) in form.highlights" :key="`hl-${idx}`" class="flex items-center gap-2">
+                  <input
+                    v-model="h.label"
+                    type="text"
+                    placeholder="Label (cth: Mentoring)"
+                    class="w-2/5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition placeholder:text-slate-400 focus:border-[#cf3d3d]/40 focus:outline-none focus:ring-2 focus:ring-[#cf3d3d]/20"
+                  />
+                  <input
+                    v-model="h.value"
+                    type="text"
+                    placeholder="Nilai (cth: Live Zoom)"
+                    class="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition placeholder:text-slate-400 focus:border-[#cf3d3d]/40 focus:outline-none focus:ring-2 focus:ring-[#cf3d3d]/20"
+                  />
+                  <button type="button" @click="removeHighlight(idx)" class="rounded-lg p-1.5 text-slate-400 transition hover:bg-[#cf3d3d]/10 hover:text-[#cf3d3d]" title="Hapus highlight">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                      <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <p v-if="sectionError('highlights')" class="mt-1 text-xs text-[#cf3d3d]">{{ sectionError('highlights') }}</p>
+            </div>
+
+            <!-- Modules (Komponen Paket) -->
+            <div>
+              <div class="mb-2 flex items-center justify-between">
+                <Label class="mb-0">Komponen Paket</Label>
+                <button type="button" @click="addModule" class="inline-flex items-center gap-1 text-xs font-bold text-[#cf3d3d] hover:text-[#b83232]">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Tambah
+                </button>
+              </div>
+              <div v-if="!form.modules.length" class="rounded-2xl border border-dashed border-slate-200 px-4 py-3 text-xs text-slate-400">
+                Belum ada komponen. Klik "Tambah" untuk menambahkan.
+              </div>
+              <div v-else class="space-y-2">
+                <div v-for="(m, idx) in form.modules" :key="`md-${idx}`" class="flex items-start gap-2">
+                  <div class="flex-1 space-y-2">
+                    <input
+                      v-model="m.name"
+                      type="text"
+                      :placeholder="`Nama komponen ${idx + 1}`"
+                      class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition placeholder:text-slate-400 focus:border-[#cf3d3d]/40 focus:outline-none focus:ring-2 focus:ring-[#cf3d3d]/20"
+                    />
+                    <input
+                      v-model="m.description"
+                      type="text"
+                      placeholder="Deskripsi singkat komponen"
+                      class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition placeholder:text-slate-400 focus:border-[#cf3d3d]/40 focus:outline-none focus:ring-2 focus:ring-[#cf3d3d]/20"
+                    />
+                  </div>
+                  <button type="button" @click="removeModule(idx)" class="mt-1 rounded-lg p-1.5 text-slate-400 transition hover:bg-[#cf3d3d]/10 hover:text-[#cf3d3d]" title="Hapus komponen">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                      <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <p v-if="sectionError('modules')" class="mt-1 text-xs text-[#cf3d3d]">{{ sectionError('modules') }}</p>
+            </div>
+
+            <!-- Suitable For (Cocok Untuk) -->
+            <div>
+              <div class="mb-2 flex items-center justify-between">
+                <Label class="mb-0">Cocok Untuk</Label>
+                <button type="button" @click="addSuitable" class="inline-flex items-center gap-1 text-xs font-bold text-[#cf3d3d] hover:text-[#b83232]">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Tambah
+                </button>
+              </div>
+              <div v-if="!form.suitable_for.length" class="rounded-2xl border border-dashed border-slate-200 px-4 py-3 text-xs text-slate-400">
+                Belum ada item. Klik "Tambah" untuk menambahkan.
+              </div>
+              <div v-else class="space-y-2">
+                <div v-for="(s, idx) in form.suitable_for" :key="`sf-${idx}`" class="flex items-center gap-2">
+                  <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#cf3d3d]/10 text-[#cf3d3d] font-bold text-xs">→</span>
+                  <input
+                    v-model="form.suitable_for[idx]"
+                    type="text"
+                    :placeholder="`Cocok untuk ${idx + 1}`"
+                    class="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition placeholder:text-slate-400 focus:border-[#cf3d3d]/40 focus:outline-none focus:ring-2 focus:ring-[#cf3d3d]/20"
+                  />
+                  <button type="button" @click="removeSuitable(idx)" class="rounded-lg p-1.5 text-slate-400 transition hover:bg-[#cf3d3d]/10 hover:text-[#cf3d3d]" title="Hapus item">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                      <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <p v-if="sectionError('suitable_for')" class="mt-1 text-xs text-[#cf3d3d]">{{ sectionError('suitable_for') }}</p>
+            </div>
+
             <div>
               <Label>Ikon Paket</Label>
               <div class="grid grid-cols-5 gap-2 sm:grid-cols-10">
@@ -266,7 +399,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, reactive, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import Breadcrumb from '@/components/ui/Breadcrumb.vue'
 import Input from '@/components/ui/Input.vue'
 import Select from '@/components/ui/Select.vue'
@@ -284,6 +417,22 @@ const togglingId = ref(null)
 
 const showCreateModal = ref(false)
 const isSubmitting = ref(false)
+
+const TYPE_DEFAULTS = {
+  online: {
+    badge: 'Online Course',
+    format: 'Belajar Daring',
+    price_note: 'Akses pembelajaran sepenuhnya online',
+  },
+  onsite: {
+    badge: 'Kelas Tatap Muka',
+    format: 'Belajar Luring',
+    price_note: 'Termasuk sesi belajar langsung di lokasi',
+  },
+}
+
+const typeDefaults = computed(() => TYPE_DEFAULTS[form.type] || TYPE_DEFAULTS.online)
+
 const form = reactive({
   name: '',
   type: 'online',
@@ -294,6 +443,9 @@ const form = reactive({
   duration_days: '30',
   is_active: true,
   features: [],
+  highlights: [],
+  modules: [],
+  suitable_for: [],
 })
 const errors = reactive({})
 
@@ -318,6 +470,35 @@ const removeFeature = (idx) => {
   form.features.splice(idx, 1)
 }
 
+const addHighlight = () => {
+  form.highlights.push({ label: '', value: '' })
+}
+
+const removeHighlight = (idx) => {
+  form.highlights.splice(idx, 1)
+}
+
+const addModule = () => {
+  form.modules.push({ name: '', description: '' })
+}
+
+const removeModule = (idx) => {
+  form.modules.splice(idx, 1)
+}
+
+const addSuitable = () => {
+  form.suitable_for.push('')
+}
+
+const removeSuitable = (idx) => {
+  form.suitable_for.splice(idx, 1)
+}
+
+const sectionError = (prefix) => {
+  const key = Object.keys(errors).find((k) => k.startsWith(prefix))
+  return key ? errors[key] : ''
+}
+
 const resetForm = () => {
   form.name = ''
   form.type = 'online'
@@ -328,6 +509,9 @@ const resetForm = () => {
   form.duration_days = '30'
   form.is_active = true
   form.features = []
+  form.highlights = []
+  form.modules = []
+  form.suitable_for = []
   Object.keys(errors).forEach((k) => delete errors[k])
 }
 
@@ -364,8 +548,22 @@ const submitCreate = async () => {
         Accept: 'application/json',
       },
       body: JSON.stringify({
-        ...form,
+        name: form.name,
+        type: form.type,
+        icon: form.icon,
+        level: form.level,
+        description: form.description,
+        price: form.price,
+        duration_days: form.duration_days,
+        is_active: form.is_active,
         features: form.features.map((f) => f.name).filter((n) => n.trim() !== ''),
+        highlights: form.highlights
+          .filter((h) => h.label.trim() !== '' && h.value.trim() !== '')
+          .map((h) => ({ label: h.label.trim(), value: h.value.trim() })),
+        modules: form.modules
+          .filter((m) => m.name.trim() !== '')
+          .map((m) => ({ name: m.name.trim(), description: m.description.trim() })),
+        suitable_for: form.suitable_for.map((s) => s.trim()).filter((s) => s !== ''),
       }),
     })
     const data = await res.json().catch(() => ({}))
