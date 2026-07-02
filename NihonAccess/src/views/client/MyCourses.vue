@@ -2,12 +2,14 @@
   <div class="mx-auto max-w-6xl space-y-8">
     <!-- Header -->
     <div>
-      <Breadcrumb
-        :items="[
-          { label: 'Dashboard', to: '/client/dashboard' },
-          { label: 'Kursus Saya' },
-        ]"
-      />
+      <div class="hidden sm:block">
+        <Breadcrumb
+          :items="[
+            { label: 'Dashboard', to: '/client/dashboard' },
+            { label: 'Kursus Saya' },
+          ]"
+        />
+      </div>
       <h1
         class="mt-3 text-2xl font-extrabold tracking-tight text-slate-800 sm:text-3xl"
       >
@@ -27,7 +29,7 @@
     </div>
 
     <!-- Filter tabs -->
-    <div v-if="!loading" class="flex items-center gap-2 overflow-x-auto">
+    <div v-if="!loading" class="flex items-center gap-2 overflow-x-auto  whitespace-nowrap pb-2">
       <button
         v-for="tab in tabs"
         :key="tab"

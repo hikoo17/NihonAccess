@@ -2,7 +2,14 @@
   <div class="mx-auto max-w-6xl space-y-8">
     <!-- Header halaman -->
     <div>
-      <Breadcrumb :items="[{ label: 'Dashboard', to: '/client/dashboard' }, { label: 'Profil Saya' }]" />
+            <div class="hidden sm:block">
+        <Breadcrumb
+          :items="[
+            { label: 'Dashboard', to: '/client/dashboard' },
+            { label: 'Kursus Saya' },
+          ]"
+        />
+      </div>
       <h1 class="mt-3 text-2xl font-extrabold tracking-tight text-slate-800 sm:text-3xl">Profil Saya</h1>
     </div>
 
