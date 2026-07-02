@@ -2,13 +2,72 @@
   <div class="min-h-screen bg-slate-50/50">
     <Navbar simple />
     
-    <section class="pt-24 pb-20 text-slate-900">
-      <div class="mx-auto max-w-6xl px-6 sm:px-8">
+    <section class="pt-24 pb-8 sm:pb-12 text-slate-900">
+      <div class="mx-auto max-w-7xl px-6 sm:px-8">
         
-        <Breadcrumb class="mb-8" :items="breadcrumbItems" />
+        <Breadcrumb class="mb-6" :items="breadcrumbItems" />
 
-        <div v-if="isLoading" class="flex items-center justify-center py-32">
-          <div class="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-[#cf3d3d]"></div>
+        <div v-if="isLoading" class="space-y-8">
+          <div class="mb-6 max-w-3xl">
+            <div class="mb-4 flex items-center gap-3">
+              <Skeleton width="7rem" height="1.5rem" rounded="full" />
+              <Skeleton width="6rem" height="1.5rem" rounded="full" />
+            </div>
+            <Skeleton width="60%" height="2rem" />
+            <div class="mt-4 space-y-2">
+              <Skeleton width="100%" height="0.875rem" />
+              <Skeleton width="85%" height="0.875rem" />
+            </div>
+          </div>
+
+          <div class="grid items-start gap-6 lg:grid-cols-3 lg:gap-8">
+            <div class="lg:col-span-2 space-y-6">
+              <div class="grid gap-4 sm:grid-cols-3">
+                <Card v-for="n in 3" :key="`hl-${n}`" class="p-5">
+                  <Skeleton width="70%" height="0.625rem" />
+                  <Skeleton class="mt-2" width="50%" height="1.25rem" />
+                </Card>
+              </div>
+
+              <Card class="p-6 sm:p-8">
+                <Skeleton width="45%" height="1.125rem" />
+                <div class="mt-5 space-y-3">
+                  <div v-for="n in 5" :key="`ft-${n}`" class="flex items-center gap-3">
+                    <Skeleton width="1.5rem" height="1.5rem" rounded="full" />
+                    <Skeleton :width="n % 2 ? '80%' : '65%'" height="0.875rem" />
+                  </div>
+                </div>
+              </Card>
+
+              <Card class="p-6 sm:p-8">
+                <Skeleton width="35%" height="1.125rem" />
+                <div class="mt-5 space-y-4">
+                  <div v-for="n in 3" :key="`md-${n}`" class="border-l-4 border-slate-200 pl-4 py-2">
+                    <Skeleton width="55%" height="0.875rem" />
+                    <Skeleton class="mt-2" width="85%" height="0.75rem" />
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            <div class="lg:col-span-1">
+              <Card class="sticky top-28 p-6 sm:p-8">
+                <div class="mb-6 text-center">
+                  <Skeleton width="50%" height="0.625rem" rounded="full" class="mx-auto" />
+                  <Skeleton class="mt-2 mx-auto" width="60%" height="2rem" />
+                  <Skeleton class="mt-2 mx-auto" width="80%" height="0.75rem" />
+                </div>
+                <div class="mb-6 space-y-3 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                  <div v-for="n in 2" :key="`px-${n}`" class="flex items-center justify-between gap-4">
+                    <Skeleton width="30%" height="0.875rem" />
+                    <Skeleton width="40%" height="0.875rem" />
+                  </div>
+                </div>
+                <Skeleton width="100%" height="3rem" rounded="2xl" />
+                <Skeleton class="mt-4 mx-auto" width="70%" height="0.75rem" />
+              </Card>
+            </div>
+          </div>
         </div>
 
         <div v-else-if="loadError" class="py-32 text-center">
@@ -17,7 +76,7 @@
         </div>
 
         <template v-else>
-          <div class="mb-10 max-w-3xl">
+          <div class="mb-6 max-w-3xl">
             <div class="mb-4 flex flex-wrap items-center gap-3">
               <span v-if="pkg.badge" class="rounded-full bg-[#cf3d3d]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#cf3d3d]">{{ pkg.badge }}</span>
               <span v-if="pkg.format" class="rounded-full bg-slate-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-500">{{ pkg.format }}</span>
@@ -31,7 +90,7 @@
             </p>
           </div>
 
-          <div class="grid items-start gap-8 lg:grid-cols-3">
+          <div class="grid items-start gap-6 lg:grid-cols-3 lg:gap-8">
             <div class="lg:col-span-2 space-y-8">
               <div class="grid gap-4 sm:grid-cols-3">
                 <Card v-for="(stat, idx) in pkg.highlights" :key="idx" class="p-5">
@@ -116,6 +175,7 @@ import Navbar from '../../components/Navbar.vue'
 import Breadcrumb from '../../components/ui/Breadcrumb.vue'
 import Button from '../../components/ui/Button.vue'
 import Card from '../../components/ui/Card.vue'
+import Skeleton from '../../components/ui/Skeleton.vue'
 import { fetchPackage } from '../../lib/packages.js'
 
 const props = defineProps({

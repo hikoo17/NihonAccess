@@ -2,23 +2,23 @@
   <div class="min-h-screen bg-slate-50/50">
     <Navbar simple />
 
-    <section class="pt-24 pb-20">
-      <div class="mx-auto max-w-6xl px-6 sm:px-8">
-        <Breadcrumb class="mb-8" :items="breadcrumbItems" />
+    <section class="pt-24 pb-8 sm:pb-12">
+      <div class="mx-auto max-w-7xl px-6 sm:px-8">
+        <Breadcrumb class="mb-6" :items="breadcrumbItems" />
 
-        <div class="mb-10 max-w-3xl">
+        <div class="mb-6 max-w-3xl">
           <div
             class="mb-4 inline-flex rounded-full bg-[#cf3d3d]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#cf3d3d]"
           >
             Pendaftaran Kursus
           </div>
           <h1
-            class="text-3xl font-extrabold tracking-tight text-slate-800 sm:text-4xl"
+            class="text-2xl font-extrabold tracking-tight text-slate-800 sm:text-3xl"
           >
             Formulir Pendaftaran
           </h1>
           <p
-            class="mt-3 max-w-2xl text-base font-normal leading-relaxed text-slate-500"
+            class="mt-1 text-sm text-slate-500"
           >
             Lengkapi data peserta untuk melanjutkan pemesanan paket kursus Anda.
           </p>
@@ -122,6 +122,7 @@ import Input from "../../components/ui/Input.vue";
 import Label from "../../components/ui/Label.vue";
 import Select from "../../components/ui/Select.vue"; // Di-import kembali
 import { confirmSnapPayment, createMidtransTransaction, loadMidtransSnap, syncRegistrationPayment } from "../../lib/midtrans.js";
+import { fetchPackage } from "../../lib/packages.js";
 import { fireAlert } from "../../lib/swal.js";
 
 const props = defineProps({
@@ -132,6 +133,7 @@ const router = useRouter();
 const route = useRoute();
 const storageKey = "nihonaccess-registration-form";
 const isSubmitting = ref(false);
+const packageName = ref("");
 
 // Cek apakah data paket harus dikunci (dikunci jika user datang membawa props type atau params dari detail)
 const isPackageLocked = computed(() => {
@@ -156,11 +158,27 @@ const form = ref({
   packageType: props.type || route.params.type || savedData.packageType || "",
 });
 
-// Beranda > Pendaftaran
-const breadcrumbItems = computed(() => [
-  { label: "Beranda", to: "/" },
-  { label: "Pendaftaran" },
-]);
+// Beranda > Nama Paket > Pendaftaran
+const breadcrumbItems = computed(() => {
+  const items = [{ label: "Beranda", to: "/" }];
+  const slug = props.type || route.params.type;
+  if (slug && packageName.value) {
+    items.push({ label: packageName.value, to: `/paket/${slug}` });
+  }
+  items.push({ label: "Pendaftaran" });
+  return items;
+});
+
+onMounted(async () => {
+  const slug = props.type || route.params.type;
+  if (!slug) return;
+  try {
+    const data = await fetchPackage(slug);
+    if (data?.name) packageName.value = data.name;
+  } catch {
+    // Abaikan — breadcrumb fallback tanpa nama paket
+  }
+});
 
 const handleSubmit = async () => {
   if (isSubmitting.value) return;
