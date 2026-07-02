@@ -13,7 +13,7 @@
             4 Langkah Pembelian Paket
           </h2>
           <p class="mt-4 text-lg text-white/80 font-medium leading-relaxed">
-            Ikuti panduan praktis ini untuk mengamankan slot belajar kamu. Proses cepat, aman, dan langsung terintegrasi.
+            Ikuti panduan praktis ini untuk mengamankan slot belajar kamu. Prosesnya cepat, aman, dan mudah diikuti.
           </p>
         </div>
         
@@ -53,20 +53,20 @@ import { ref } from 'vue'
 
 const steps = ref([
   {
-    title: '1. Pilih Paket & Isi Form',
-    desc: 'Tentukan paket pilihanmu, klik tombol isi form, lalu lengkapi informasi biodata peserta dengan benar.'
+    title: 'Pilih Paket',
+    desc: 'Telusuri pilihan paket di beranda, lalu klik "Lihat Detail" untuk mengetahui fitur, modul, dan harga lengkapnya.'
   },
   {
-    title: '2. Simpan Data Pendaftaran',
-    desc: 'Tekan tombol simpan data. Sistem akan mengunci paket pilihanmu dan mengaktifkan tombol bayar di halaman detail.'
+    title: 'Isi Formulir Pendaftaran',
+    desc: 'Klik "Daftar Sekarang" dan lengkapi data peserta: nama, email, serta nomor WhatsApp yang aktif.'
   },
   {
-    title: '3. Pembayaran Aman',
-    desc: 'Klik "Bayar Sekarang" untuk membuka Midtrans Snap. Pilih metode pembayaran favoritmu (QRIS, Bank Transfer, dll).'
+    title: 'Simpan Data & Bayar',
+    desc: 'Tekan "Simpan Data & Lihat Pembayaran". Halaman pembayaran akan langsung terbuka — pilih metode favoritmu: QRIS, transfer bank, atau e-wallet.'
   },
   {
-    title: '4. Mulai Belajar!',
-    desc: 'Setelah pembayaran sukses, kamu akan otomatis diarahkan ke platform belajar utama kami untuk memulai kelas.'
+    title: 'Verifikasi & Mulai Belajar',
+    desc: 'Setelah pembayaran sukses, kamu diarahkan ke halaman verifikasi. Akun dibuat otomatis dan username beserta password dikirim ke email/WhatsApp untuk langsung memulai kelas.'
   }
 ])
 </script>

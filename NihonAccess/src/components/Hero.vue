@@ -44,7 +44,7 @@
           </h1>
           
           <p data-aos="fade-up" data-aos-delay="300" class="mx-auto max-w-xl text-lg text-slate-700 font-medium leading-relaxed lg:mx-0">
-            Kursus lengkap dari nol hingga siap menghadapi JLPT N5. Metode interaktif, menyenangkan, dan fleksibel.
+            Kursus lengkap mulai dari nol hingga kamu bisa membaca, menulis, dan ngobrol pakai bahasa Jepang.
           </p>
 
           <div data-aos="fade-up" data-aos-delay="400" class="flex flex-wrap justify-center gap-4 lg:justify-start">
@@ -83,14 +83,14 @@
             class="flex items-center justify-center lg:justify-start gap-8"
           >
             <div>
-              <p class="text-[11px] font-bold text-slate-400 tracking-widest uppercase">Course Tersedia</p>
+              <p class="text-[11px] font-bold text-slate-400 tracking-widest uppercase">Kursus Tersedia</p>
               <p class="text-xl lg:text-2xl font-extrabold text-slate-900 mt-0.5">6 Paket</p>
             </div>
             
             <div class="h-8 w-[1px] bg-slate-200 self-end mb-1"></div>
             
             <div>
-              <p class="text-[11px] font-bold text-slate-400 tracking-widest uppercase">Student Terdaftar</p>
+              <p class="text-[11px] font-bold text-slate-400 tracking-widest uppercase">Siswa Terdaftar</p>
               <p class="text-xl lg:text-2xl font-extrabold text-slate-900 mt-0.5">1.200+</p>
             </div>
           </div>

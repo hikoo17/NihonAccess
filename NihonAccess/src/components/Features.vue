@@ -86,7 +86,7 @@ import { ref } from 'vue'
 const features = ref([
   { 
     title: 'Materi Lengkap', 
-    desc: 'Dari Hiragana, Katakana, Kanji dasar, hingga Grammar JLPT N5.',
+    desc: 'Mulai dari huruf dasar Jepang (Hiragana, Katakana, Kanji) sampai tata bahasa dan percakapan sehari-hari.',
     iconRaw: '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/>'
   },
   { 

@@ -9,7 +9,7 @@
         Jangan Biarkan Impian Berbahasa Jepang Hanya Mimpi
       </h2>
       <p class="mx-auto max-w-xl text-lg text-white/85">
-        Kelas bulan ini hanya menerima <span class="font-bold text-white">30 siswa</span>. Daftar sekarang dan mulailah perjalanan menuju JLPT N5.
+        Kelas bulan ini hanya menerima <span class="font-bold text-white">30 siswa</span>. Daftar sekarang dan mulailah perjalanan belajar bahasa Jepang dari nol.
       </p>
       <div class="mt-8 flex flex-wrap justify-center gap-4">
         <button class="rounded-full bg-white px-10 py-4 text-lg font-extrabold text-[#cf3d3d] shadow-xl hover:scale-105 hover:shadow-2xl transition-all duration-300">

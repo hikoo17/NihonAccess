@@ -12,11 +12,11 @@
         </div>
         <div data-aos="fade-up" data-aos-delay="200">
           <div class="text-3xl lg:text-4xl font-black text-white">94.8%</div>
-          <div class="text-xs lg:text-sm font-bold text-white/80 tracking-wide uppercase mt-1">Kelulusan N5</div>
+          <div class="text-xs lg:text-sm font-bold text-white/80 tracking-wide uppercase mt-1">Tingkat Kelulusan</div>
         </div>
         <div data-aos="fade-up" data-aos-delay="300">
           <div class="text-3xl lg:text-4xl font-black text-white">10+</div>
-          <div class="text-xs lg:text-sm font-bold text-white/80 tracking-wide uppercase mt-1">Native & N2 Tutor</div>
+          <div class="text-xs lg:text-sm font-bold text-white/80 tracking-wide uppercase mt-1">Pengajar Berpengalaman</div>
         </div>
         <div data-aos="fade-up" data-aos-delay="400">
           <div class="text-3xl lg:text-4xl font-black text-white">50+</div>

@@ -64,44 +64,44 @@ import { ref } from 'vue'
 const testimonials = ref([
   { 
     metricLabel: 'Penguasaan Huruf', 
-    quote: 'Penjelasannya mudah dipahami dan materinya sangat lengkap. Sekarang saya sudah lancar membaca Hiragana & Katakana!', 
+    quote: 'Penjelasannya mudah dipahami dan materinya sangat lengkap. Sekarang saya sudah lancar membaca huruf Jepang!', 
     name: 'Siti Aminah', 
     status: 'SISWA PAKET BASIC',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80'
   },
   { 
-    metricLabel: 'Peningkatan Skor Tryout', 
-    quote: 'Berkat kursus ini saya jadi jauh lebih siap menghadapi ujian JLPT N5. Bank soal latihannya ter-update dan sangat membantu!', 
+    metricLabel: 'Peningkatan Nilai Latihan', 
+    quote: 'Berkat kursus ini saya jadi jauh lebih siap menghadapi ujian bahasa Jepang. Soal-soal latihannya lengkap dan terus diperbarui!', 
     name: 'Dimas Kurniawan', 
     status: 'SISWA PAKET PREMIUM',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80'
   },
   { 
     metricLabel: 'Waktu Belajar Efektif', 
-    quote: 'Kelas private sangat membantu saya yang punya jadwal padat. Sensei-nya ramah dan metode penjelasannya sangat mendalam.', 
+    quote: 'Kelas private sangat membantu saya yang punya jadwal padat. Pengajarnya ramah dan cara menjelaskannya sangat detail.', 
     name: 'Rina Mardiana', 
     status: 'SISWA PAKET PRIVATE',
     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=160&q=80'
   },
   { 
-    metricLabel: 'Durasi Praktek Kaiwa', 
-    quote: 'Sesi interaktif langsung dengan native & mentor berpengalaman bikin saya tidak takut lagi buat ngomong pakai bahasa Jepang.', 
+    metricLabel: 'Praktek Percakapan', 
+    quote: 'Sesi interaktif langsung dengan pengajar asli Jepang dan mentor berpengalaman bikin saya tidak takut lagi buat ngomong pakai bahasa Jepang.', 
     name: 'Fahmi Idris', 
-    status: 'ALUMNI N4 HUNTER',
+    status: 'ALUMNI PAKET PRIVATE',
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80'
   },
   { 
-    metricLabel: 'Pemahaman Bunpou', 
-    quote: 'Kurikulumnya seru dan tidak membosankan. Pola kalimat (Grammar) yang rumit disederhanakan lewat analogi kehidupan sehari-hari.', 
+    metricLabel: 'Pemahaman Tata Bahasa', 
+    quote: 'Kurikulumnya seru dan tidak membosankan. Pola kalimat yang rumit disederhanakan lewat analogi kehidupan sehari-hari.', 
     name: 'Aulia Rahma', 
     status: 'SISWA PAKET PREMIUM',
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80'
   },
   { 
     metricLabel: 'Tingkat Kelulusan Ujian', 
-    quote: 'Alur belajarnya bener-bener terarah dengan rapi. Saya berhasil lulus JLPT N5 dalam sekali coba berkat simulasi intensif di sini.', 
+    quote: 'Alur belajarnya bener-bener terarah dengan rapi. Saya berhasil lulus ujian bahasa Jepang dalam sekali coba berkat latihan intensif di sini.', 
     name: 'Kevin Sanjaya', 
-    status: 'ALUMNI JLPT N5',
+    status: 'ALUMNI PAKET PREMIUM',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&q=80'
   }
 ])

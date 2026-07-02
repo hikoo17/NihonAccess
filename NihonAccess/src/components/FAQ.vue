@@ -42,7 +42,7 @@
 <script setup>
 import { ref } from 'vue'
 const faqs = ref([
-  { q: 'Apakah cocok untuk pemula?', a: 'Sangat cocok! Materi kami disusun rapi benar-benar mulai dari nol, pengenalan huruf dasar, hingga tingkat mahir JLPT N5.', open: false },
+  { q: 'Apakah cocok untuk pemula?', a: 'Sangat cocok! Materi kami disusun rapi benar-benar mulai dari nol, dari pengenalan huruf dasar, hingga kamu bisa berbahasa Jepang dengan lancar.', open: false },
   { q: 'Kapan saya bisa mulai belajar?', a: 'Seketika setelah pembayaran dikonfirmasi, Anda bisa langsung mengakses seluruh materi video dan modul kapan saja secara fleksibel.', open: false },
   { q: 'Bagaimana cara pembayarannya?', a: 'Kami mendukung berbagai macam metode pembayaran digital mulai dari Transfer Bank, E-Wallet (OVO, Dana, GoPay), hingga QRIS.', open: false }
 ])
